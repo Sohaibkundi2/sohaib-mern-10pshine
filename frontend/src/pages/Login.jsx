@@ -1,6 +1,7 @@
 import { useState } from "react"
-import axios from "axios"
 import { Link, useNavigate } from "react-router-dom"
+import { motion } from "framer-motion"
+import { authAPI } from "../services/api"
 
 export default function Login() {
     const navigate = useNavigate()
@@ -12,7 +13,9 @@ export default function Login() {
 
     const handleSubmit = async (e) => {
         e.preventDefault()
+        setError("")
 
+        // Validation
         if (!email || !password) {
             setError("Email and password are required")
             return
@@ -23,65 +26,130 @@ export default function Login() {
             return
         }
 
-
         if (password.length < 6) {
             setError("Password must be at least 6 characters")
             return
         }
 
-        setLoading(true)
-        setTimeout(() => {
-            const mockUser = { name: "Sohaib", email }
-            localStorage.setItem("token", "mock-token-123")
-            localStorage.setItem("user", JSON.stringify(mockUser))
-            setLoading(false)
-            navigate("/dashboard")
-        }, 800)
+        try {
+            setLoading(true)
+            
+            // Call login API
+            const response = await authAPI.login({ email, password })
+            
+            console.log('Login response:', response.data)
 
+            // Save token and user data
+            if (response.data.data?.accessToken) {
+                localStorage.setItem("token", response.data.data.accessToken)
+            }
+            
+            if (response.data.data?.user) {
+                localStorage.setItem("user", JSON.stringify(response.data.data.user))
+            }
+
+            // Navigate to dashboard
+            navigate("/dashboard")
+        } catch (err) {
+            console.error('Login error:', err)
+            
+            // Handle different error scenarios
+            if (err.response) {
+                // Server responded with error
+                setError(err.response.data?.message || "Login failed")
+            } else if (err.request) {
+                // Request made but no response
+                setError("Cannot connect to server. Please check if backend is running.")
+            } else {
+                // Something else happened
+                setError("An unexpected error occurred")
+            }
+        } finally {
+            setLoading(false)
+        }
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-900">
-            <div className="max-w-md w-full p-6 rounded-2xl shadow-lg bg-gradient-to-br from-gray-950 via-slate-700 to-black">
-                <h2 className="text-xl font-semibold text-center text-white mb-4">Login</h2>
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-zinc-900 via-orange-900/40 to-rose-900/30 px-4">
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+                className="max-w-md w-full p-8 rounded-3xl backdrop-blur-xl bg-white/10 border border-white/20 shadow-2xl shadow-orange-500/20"
+            >
+                {/* Logo */}
+                <div className="flex justify-center mb-6">
+                    <div className="flex items-center gap-2">
+                        <div className="w-10 h-10 bg-gradient-to-r from-rose-400 to-pink-500 rounded-xl shadow-lg shadow-rose-500/30"></div>
+                        <span className="text-2xl font-bold bg-gradient-to-r from-orange-400 to-pink-500 bg-clip-text text-transparent">
+                            Glass Notes
+                        </span>
+                    </div>
+                </div>
+
+                <h2 className="text-2xl font-semibold text-center text-white mb-2">
+                    Welcome Back
+                </h2>
+                <p className="text-center text-gray-300 text-sm mb-6">
+                    Login to access your notes
+                </p>
 
                 {error && (
-                    <div className="bg-red-600 text-white text-sm p-2 rounded-lg text-center mb-3">
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="bg-red-500/20 border border-red-500/50 text-red-200 text-sm p-3 rounded-xl text-center mb-4 backdrop-blur-sm"
+                    >
                         {error}
-                    </div>
+                    </motion.div>
                 )}
 
                 <form onSubmit={handleSubmit} className="space-y-4">
-                    <input
-                        type="email"
-                        placeholder="Email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        className="w-full p-3 rounded-xl bg-gray-900 border border-gray-600 text-white outline-none focus:border-white"
-                    />
+                    <div>
+                        <label className="text-sm text-gray-300 mb-1 block">Email</label>
+                        <input
+                            type="email"
+                            placeholder="your@email.com"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            className="w-full p-3 rounded-xl bg-white/5 border border-white/20 text-white placeholder-gray-400 outline-none focus:border-orange-400 focus:bg-white/10 transition-all"
+                        />
+                    </div>
 
-                    <input
-                        type="password"
-                        placeholder="Password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        className="w-full p-3 rounded-xl bg-gray-900 border border-gray-600 text-white outline-none focus:border-white"
-                    />
+                    <div>
+                        <label className="text-sm text-gray-300 mb-1 block">Password</label>
+                        <input
+                            type="password"
+                            placeholder="••••••••"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            className="w-full p-3 rounded-xl bg-white/5 border border-white/20 text-white placeholder-gray-400 outline-none focus:border-orange-400 focus:bg-white/10 transition-all"
+                        />
+                    </div>
 
-                    <button
+                    <motion.button
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
                         type="submit"
                         disabled={loading}
-                        className="w-full p-3 rounded-xl bg-white text-black font-medium disabled:opacity-50"
+                        className="w-full p-3 rounded-xl bg-gradient-to-r from-orange-600 to-pink-500 text-white font-medium disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-orange-500/30 hover:shadow-orange-500/50 transition-all"
                     >
                         {loading ? "Logging in..." : "Login"}
-                    </button>
+                    </motion.button>
 
-                    <p className="text-center text-sm text-gray-300">
-                        No account?{" "}
-                        <Link to="/register" className="text-blue-400 underline">Register</Link>
-                    </p>
+                    <div className="text-center pt-2">
+                        <p className="text-sm text-gray-300">
+                            Don't have an account?{" "}
+                            <Link 
+                                to="/register" 
+                                className="text-orange-400 hover:text-orange-300 font-medium underline transition-colors"
+                            >
+                                Register here
+                            </Link>
+                        </p>
+                    </div>
                 </form>
-            </div>
+            </motion.div>
         </div>
     )
 }

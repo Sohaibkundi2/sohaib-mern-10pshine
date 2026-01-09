@@ -16,7 +16,7 @@ export default function AppUI() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-zinc-900 via-purple-900/40 to-rose-900/30 text-white transition-all">
+    <div className="min-h-screen bg-gradient-to-b from-zinc-900 via-pink-900/20 to-rose-900/30 text-white transition-all">
 
       {/* Navbar */}
       <nav className="w-full backdrop-blur-lg bg-black/20 border-b border-white/10 px-4 md:px-6 py-4 flex justify-between items-center fixed top-0 left-0 z-50">
@@ -68,7 +68,7 @@ export default function AppUI() {
                 className="absolute right-0 mt-2 w-64 backdrop-blur-xl bg-black/80 border border-white/20 rounded-2xl shadow-2xl shadow-purple-500/20 overflow-hidden z-50"
               >
                 {/* Profile Header */}
-                <div className="p-4 border-b border-white/10 bg-gradient-to-br from-purple-900/40 to-rose-900/40">
+                <div className="p-4 border-b border-white/10 bg-gradient-to-br from-orange-600/40 to-rose-900/40">
                   <div className="flex items-center gap-3">
                     <div className="w-12 h-12 rounded-full bg-gradient-to-r from-pink-500 to-rose-500 flex items-center justify-center text-lg font-bold border-2 border-white/30">
                       {user.name.charAt(0).toUpperCase()}
@@ -137,7 +137,7 @@ export default function AppUI() {
               animate={{ x: 0 }}
               exit={{ x: "-100%" }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="fixed top-0 left-0 w-72 h-screen backdrop-blur-xl bg-gradient-to-b from-gold-500/50 to-rose-900/80 border-r border-white/20 pt-20 px-5 shadow-2xl shadow-purple-700/40 z-50 md:hidden overflow-y-auto"
+              className="fixed top-0 left-0 w-72 h-screen backdrop-blur-xl bg-gradient-to-b from-orange-600/40 to-rose-900/80 border-r border-white/20 pt-20 px-5 shadow-2xl shadow-purple-700/40 z-50 md:hidden overflow-y-auto"
             >
               {/* User Info in Mobile Drawer */}
               <div className="mb-6 p-4 rounded-2xl bg-white/10 border border-white/20">
@@ -204,7 +204,7 @@ export default function AppUI() {
       <motion.aside
         initial={{ x: "-100%" }}
         animate={{ x: 0 }}
-        className="hidden md:block fixed top-0 left-0 w-64 h-screen backdrop-blur-xl bg-gradient-to-b from-purple-900/40 to-rose-900/30 border-r border-white/10 pt-20 px-5 shadow-2xl shadow-purple-700/20 overflow-y-auto"
+        className="hidden md:block fixed top-0 left-0 w-64 h-screen backdrop-blur-xl bg-gradient-to-b from-orange-600/20 to-rose-900/30 border-r border-white/10 pt-20 px-5 shadow-2xl shadow-purple-700/20 overflow-y-auto"
       >
         <div className="flex items-center gap-2 mb-6">
           <div className="w-6 h-6 bg-gradient-to-r from-rose-400 to-pink-500 rounded-md shadow-lg shadow-rose-500/30"></div>
@@ -247,7 +247,7 @@ export default function AppUI() {
                 <h3 className="font-semibold text-sm md:text-base bg-gradient-to-r from-pink-400 to-rose-400 bg-clip-text text-transparent">
                   Note Title {i + 1}
                 </h3>
-                <button className="text-xs opacity-70">📅 12 Jan</button>
+                <span className="text-xs opacity-70">📅 12 Jan 2025</span>
               </div>
               <p className="text-xs md:text-sm mt-2 line-clamp-3 opacity-90">
                 This is a preview of the note content. Notes will be shown here with a brief snippet to give an idea of what the note is about. You can edit or delete the note using the buttons below.
