@@ -2,6 +2,7 @@ import { Route,Routes } from "react-router"
 import './App.css'
 import Register from "./pages/signup"
 import Login from "./pages/Login"
+import AppUI from "./pages/AppUI"
 
 function App() {
 
@@ -9,7 +10,7 @@ function App() {
     <>
     <div className="min-h-screen bg-gray-900">
     <Routes>
-      <Route path="/dashboard" element={<h1>Dashboard</h1>}/>
+      <Route path="/dashboard" element={<AppUI/>}/>
       <Route path="/register" element={<Register/>}/>
       <Route path="/login" element={<Login/>}/>
     </Routes>

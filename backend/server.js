@@ -37,9 +37,11 @@ app.get("/api/health", (req, res) => {
 // Routes
 import authRoutes from "./src/routes/auth.route.js";
 import noteRoutes from "./src/routes/note.routes.js";
+import profileRoutes from "./src/routes/profile.routes.js";
 
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/notes", noteRoutes);
+app.use("/api/v1/profile", profileRoutes);
 
 app.use(errorHandler);
 

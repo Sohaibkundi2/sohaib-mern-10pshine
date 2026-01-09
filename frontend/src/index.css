@@ -1,1 +1,19 @@
 @import "tailwindcss";
+
+:root {
+  --glass-bg: rgba(255, 255, 255, 0.18);
+  --glass-border: rgba(255, 255, 255, 0.25);
+  --shadow-soft: 0 8px 32px rgba(0, 0, 0, 0.18);
+  --shadow-strong: 0 12px 40px rgba(0, 0, 0, 0.25);
+  --gradient-1: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+  --gradient-2: linear-gradient(135deg, #f7971e 0%, #ffd200 100%);
+  --gradient-3: linear-gradient(135deg, #00b09b 0%, #96c93d 100%);
+  --gradient-4: linear-gradient(135deg, #ff5f6d 0%, #ffc371 100%);
+}
+
+[data-theme="dark"] {
+  --glass-bg: rgba(0, 0, 0, 0.28);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --shadow-soft: 0 8px 32px rgba(0, 0, 0, 0.4);
+  --shadow-strong: 0 12px 40px rgba(0, 0, 0, 0.6);
+}
