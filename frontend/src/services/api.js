@@ -81,13 +81,53 @@ export const authAPI = {
   logout: () => api.post('/auth/logout'),
 
   // Get current user
-  getCurrentUser: () => api.get('/profile/me'),
+  getCurrentUser: () => api.get('/auth/me'),
 
   // Change password
-  changePassword: (data) => api.post('/profile/change-password', data),
+  changePassword: (data) => api.post('/auth/change-password', data),
 
   // Refresh token
-  refreshToken: () => api.post('/auth/refresh-token'),
+  refreshToken: () => api.post('/auth/refresh'),
+};
+
+// ============================================
+// PROFILE API ENDPOINTS
+// ============================================
+export const profileAPI = {
+  // Get user profile
+  getProfile: () => api.get('/profile/me'),
+
+  // Update profile info (fullName, email)
+  updateProfile: (data) => api.patch('/profile/update', data),
+
+  // Change password
+  changePassword: (data) => api.patch('/profile/password', data),
+
+  // Update avatar
+  updateAvatar: (formData) => api.patch('/profile/avatar', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  }),
+};
+
+// ============================================
+// NOTES API ENDPOINTS
+// ============================================
+export const notesAPI = {
+  // Get all notes with filters
+  getAll: (params = {}) => api.get('/notes', { params }),
+
+  // Get single note
+  getById: (id) => api.get(`/notes/${id}`),
+
+  // Create new note
+  create: (noteData) => api.post('/notes', noteData),
+
+  // Update note
+  update: (id, noteData) => api.patch(`/notes/${id}`, noteData),
+
+  // Delete note
+  delete: (id) => api.delete(`/notes/${id}`),
+
 };
 
 export default api;

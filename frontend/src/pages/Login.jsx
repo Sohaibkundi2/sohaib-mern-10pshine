@@ -2,9 +2,11 @@ import { useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { motion } from "framer-motion"
 import { authAPI } from "../services/api"
+import { useAuth } from "../context/AuthContext"
 
 export default function Login() {
     const navigate = useNavigate()
+    const { login } = useAuth()
 
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
@@ -34,34 +36,25 @@ export default function Login() {
         try {
             setLoading(true)
             
-            // Call login API
             const response = await authAPI.login({ email, password })
             
             console.log('Login response:', response.data)
 
-            // Save token and user data
-            if (response.data.data?.accessToken) {
-                localStorage.setItem("token", response.data.data.accessToken)
+            // Use auth context login
+            if (response.data.data?.accessToken && response.data.data?.user) {
+                login(response.data.data.user, response.data.data.accessToken)
+                navigate("/dashboard")
+            } else {
+                setError("Invalid response from server")
             }
-            
-            if (response.data.data?.user) {
-                localStorage.setItem("user", JSON.stringify(response.data.data.user))
-            }
-
-            // Navigate to dashboard
-            navigate("/dashboard")
         } catch (err) {
             console.error('Login error:', err)
             
-            // Handle different error scenarios
             if (err.response) {
-                // Server responded with error
                 setError(err.response.data?.message || "Login failed")
             } else if (err.request) {
-                // Request made but no response
                 setError("Cannot connect to server. Please check if backend is running.")
             } else {
-                // Something else happened
                 setError("An unexpected error occurred")
             }
         } finally {
@@ -77,7 +70,6 @@ export default function Login() {
                 transition={{ duration: 0.5 }}
                 className="max-w-md w-full p-8 rounded-3xl backdrop-blur-xl bg-white/10 border border-white/20 shadow-2xl shadow-orange-500/20"
             >
-                {/* Logo */}
                 <div className="flex justify-center mb-6">
                     <div className="flex items-center gap-2">
                         <div className="w-10 h-10 bg-gradient-to-r from-rose-400 to-pink-500 rounded-xl shadow-lg shadow-rose-500/30"></div>

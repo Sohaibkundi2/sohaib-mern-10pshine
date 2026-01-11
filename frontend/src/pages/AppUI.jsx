@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, User, LogOut, Settings, Bell, Search } from "lucide-react";
+import ProfileMenu from "../components/ProfileMenu";
 
 export default function AppUI() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -45,77 +46,8 @@ export default function AppUI() {
           <a href="#" className="hover:text-rose-400 transition">About</a>
         </div>
 
-        {/* Profile Avatar (Both Mobile & Desktop) */}
-        <div className="relative">
-          <button 
-            onClick={() => setShowProfileMenu(!showProfileMenu)}
-            className="w-9 h-9 md:w-10 md:h-10 rounded-full bg-gradient-to-r from-pink-500 to-rose-500 flex items-center justify-center text-sm font-semibold border-2 border-white/20 hover:border-white/40 transition"
-          >
-            {user.avatar ? (
-              <img src={user.avatar} alt={user.name} className="w-full h-full rounded-full object-cover" />
-            ) : (
-              user.name.charAt(0).toUpperCase()
-            )}
-          </button>
-
-          {/* Profile Dropdown */}
-          <AnimatePresence>
-            {showProfileMenu && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95, y: -10 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.95, y: -10 }}
-                className="absolute right-0 mt-2 w-64 backdrop-blur-xl bg-black/80 border border-white/20 rounded-2xl shadow-2xl shadow-purple-500/20 overflow-hidden z-50"
-              >
-                {/* Profile Header */}
-                <div className="p-4 border-b border-white/10 bg-gradient-to-br from-orange-600/40 to-rose-900/40">
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-r from-pink-500 to-rose-500 flex items-center justify-center text-lg font-bold border-2 border-white/30">
-                      {user.name.charAt(0).toUpperCase()}
-                    </div>
-                    <div>
-                      <p className="font-semibold text-sm">{user.name}</p>
-                      <p className="text-xs text-gray-400">{user.email}</p>
-                    </div>
-                  </div>
-                  
-                  {/* Stats */}
-                  <div className="flex gap-4 mt-3 text-xs">
-                    <div>
-                      <span className="text-gray-400">Notes</span>
-                      <p className="font-semibold text-rose-400">{user.notesCount}</p>
-                    </div>
-                    <div>
-                      <span className="text-gray-400">Joined</span>
-                      <p className="font-semibold">{user.joinedDate}</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Menu Items */}
-                <div className="p-2">
-                  <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/10 transition text-sm">
-                    <User size={16} className="text-rose-400" />
-                    <span>My Profile</span>
-                  </button>
-                  <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/10 transition text-sm">
-                    <Settings size={16} className="text-rose-400" />
-                    <span>Settings</span>
-                  </button>
-                  <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/10 transition text-sm">
-                    <Bell size={16} className="text-rose-400" />
-                    <span>Notifications</span>
-                  </button>
-                  <div className="border-t border-white/10 my-2"></div>
-                  <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-red-500/20 transition text-sm text-red-400">
-                    <LogOut size={16} />
-                    <span>Logout</span>
-                  </button>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
+        {/* Profile Menu Trigger */}
+        <ProfileMenu/>
       </nav>
 
       {/* Mobile Sidebar Drawer */}
