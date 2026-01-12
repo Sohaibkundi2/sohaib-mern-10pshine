@@ -4,17 +4,17 @@ import { motion, AnimatePresence } from "framer-motion";
 import { User, LogOut, Settings, Bell } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { theme } from "../utils/theme";
+import LogoutModal from "./LogoutModal";
 import dayjs from "dayjs";
-import LogoutModal from "./LogoutModal"; 
 
 export default function ProfileMenu() {
   const navigate = useNavigate();
-  const { user, logout } = useAuth();
-  
+  const { user } = useAuth();
   const [showProfileMenu, setShowProfileMenu] = useState(false);
-  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
-  // User data with fallbacks
+  // Get user data with fallbacks
   const userData = {
     name: user?.fullName || "User",
     email: user?.email || "user@example.com",
@@ -25,9 +25,9 @@ export default function ProfileMenu() {
       : "Recently"
   };
 
-  const handleLogout = async () => {
-    await logout();
-    navigate("/login");
+  const handleLogout = () => {
+    setShowProfileMenu(false);
+    setShowLogoutModal(true);
   };
 
   const handleProfileClick = () => {
@@ -45,7 +45,7 @@ export default function ProfileMenu() {
       {/* Profile Avatar Button */}
       <button 
         onClick={() => setShowProfileMenu(!showProfileMenu)}
-        className="w-9 h-9 md:w-10 md:h-10 rounded-full bg-gradient-to-r from-pink-500 to-rose-500 flex items-center justify-center text-sm font-semibold border-2 border-white/20 hover:border-white/40 transition focus:outline-none"
+        className="w-9 h-9 md:w-10 md:h-10 rounded-full bg-gradient-to-r from-pink-500 to-rose-500 flex items-center justify-center text-sm font-semibold border-2 border-white/20 hover:border-white/40 transition"
       >
         {userData.avatar ? (
           <img 
@@ -62,7 +62,7 @@ export default function ProfileMenu() {
       <AnimatePresence>
         {showProfileMenu && (
           <>
-            {/* Backdrop to close menu when clicking outside (especially on mobile) */}
+            {/* Backdrop for mobile */}
             <div
               className="fixed inset-0 z-40 md:hidden"
               onClick={() => setShowProfileMenu(false)}
@@ -72,7 +72,7 @@ export default function ProfileMenu() {
               initial={{ opacity: 0, scale: 0.95, y: -10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: -10 }}
-              className="absolute right-0 mt-2 w-64 backdrop-blur-xl bg-black/80 border border-white/20 rounded-2xl shadow-2xl shadow-orange-500/20 overflow-hidden z-50"
+              className={`absolute right-0 mt-2 w-64 backdrop-blur-xl ${theme.card} border rounded-2xl shadow-2xl overflow-hidden z-50`}
             >
               {/* Profile Header */}
               <div className="p-4 border-b border-white/10 bg-gradient-to-br from-orange-600/40 to-rose-900/40">
@@ -88,21 +88,21 @@ export default function ProfileMenu() {
                       userData.name.charAt(0).toUpperCase()
                     )}
                   </div>
-                  <div className="overflow-hidden">
-                    <p className="font-semibold text-sm text-white truncate">{userData.name}</p>
-                    <p className="text-xs text-gray-300 truncate">{userData.email}</p>
+                  <div>
+                    <p className={`font-semibold text-sm ${theme.text}`}>{userData.name}</p>
+                    <p className={`text-xs ${theme.textMuted}`}>{userData.email}</p>
                   </div>
                 </div>
                 
-                {/* Mini Stats */}
+                {/* Stats */}
                 <div className="flex gap-4 mt-3 text-xs">
                   <div>
-                    <span className="text-gray-400">Notes</span>
+                    <span className={theme.textMuted}>Notes</span>
                     <p className="font-semibold text-orange-400">{userData.notesCount}</p>
                   </div>
                   <div>
-                    <span className="text-gray-400">Joined</span>
-                    <p className="font-semibold text-white">{userData.joinedDate}</p>
+                    <span className={theme.textMuted}>Joined</span>
+                    <p className={`font-semibold ${theme.text}`}>{userData.joinedDate}</p>
                   </div>
                 </div>
               </div>
@@ -111,7 +111,7 @@ export default function ProfileMenu() {
               <div className="p-2">
                 <button 
                   onClick={handleProfileClick}
-                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/10 transition text-sm text-white"
+                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/10 transition text-sm ${theme.text}`}
                 >
                   <User size={16} className="text-orange-400" />
                   <span>My Profile</span>
@@ -119,28 +119,28 @@ export default function ProfileMenu() {
                 
                 <button 
                   onClick={handleSettingsClick}
-                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/10 transition text-sm text-white"
+                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/10 transition text-sm ${theme.text}`}
                 >
                   <Settings size={16} className="text-orange-400" />
                   <span>Settings</span>
                 </button>
                 
                 <button 
-                  onClick={() => setShowProfileMenu(false)}
-                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/10 transition text-sm text-white"
+                  onClick={() => {
+                    setShowProfileMenu(false);
+                    // Add notification functionality later
+                  }}
+                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/10 transition text-sm ${theme.text}`}
                 >
                   <Bell size={16} className="text-orange-400" />
                   <span>Notifications</span>
                 </button>
                 
-                <div className="border-t border-white/10 my-2"></div>
+                <div className={`border-t ${theme.border} my-2`}></div>
                 
                 <button 
-                  onClick={() => {
-                    setShowProfileMenu(false); // Close dropdown first
-                    setShowLogoutConfirm(true); // Then open confirm modal
-                  }}
-                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-red-500/20 transition text-sm text-red-400"
+                  onClick={handleLogout}
+                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-red-500/20 transition text-sm text-red-400`}
                 >
                   <LogOut size={16} />
                   <span>Logout</span>
@@ -150,12 +150,11 @@ export default function ProfileMenu() {
           </>
         )}
       </AnimatePresence>
-        {/* Logout Confirmation Modal */}
-        
+
+      {/* Logout Modal */}
       <LogoutModal 
-        isOpen={showLogoutConfirm} 
-        onClose={() => setShowLogoutConfirm(false)} 
-        onConfirm={handleLogout} 
+        isOpen={showLogoutModal}
+        onClose={() => setShowLogoutModal(false)}
       />
     </div>
   );

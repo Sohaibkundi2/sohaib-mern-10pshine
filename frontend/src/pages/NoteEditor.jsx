@@ -4,10 +4,12 @@ import { motion } from "framer-motion";
 import { ArrowLeft, Save, X } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import { notesAPI } from "../services/api";
+import { theme } from "../utils/theme";
+import Navbar from "../components/Navbar";
 
 export default function NoteEditor() {
   const navigate = useNavigate();
-  const { id } = useParams(); // If id exists, we're editing
+  const { id } = useParams();
   const isEditing = !!id;
 
   const [noteData, setNoteData] = useState({
@@ -19,7 +21,6 @@ export default function NoteEditor() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  // Fetch note data if editing
   useEffect(() => {
     if (isEditing) {
       fetchNote();
@@ -61,7 +62,6 @@ export default function NoteEditor() {
     setError("");
     setSuccess("");
 
-    // Validation
     if (!noteData.title.trim()) {
       setError("Title is required");
       return;
@@ -81,14 +81,12 @@ export default function NoteEditor() {
       setLoading(true);
 
       if (isEditing) {
-        // Update existing note
         await notesAPI.update(id, {
           title: noteData.title.trim(),
           content: noteData.content.trim(),
         });
         setSuccess("Note updated successfully!");
       } else {
-        // Create new note
         await notesAPI.create({
           title: noteData.title.trim(),
           content: noteData.content.trim(),
@@ -96,7 +94,6 @@ export default function NoteEditor() {
         setSuccess("Note created successfully!");
       }
 
-      // Redirect after success
       setTimeout(() => navigate("/dashboard"), 1500);
     } catch (err) {
       console.error("Failed to save note:", err);
@@ -108,20 +105,25 @@ export default function NoteEditor() {
 
   if (fetchLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-zinc-900 via-orange-900/40 to-rose-900/30 flex items-center justify-center">
-        <div className="text-white text-xl">Loading note...</div>
+      <div className={`min-h-screen bg-gradient-to-br ${theme.background} flex items-center justify-center`}>
+        <div className={`${theme.text} text-xl`}>Loading note...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-zinc-900 via-orange-900/40 to-rose-900/30 p-4 md:p-8">
+    <div className={`min-h-screen bg-gradient-to-br ${theme.background} text-white`}>
+      {/* Navbar */}
+      <Navbar showSearch={false} />
+
+      {/* Main Content */}
+      <div className="pt-20 p-4 md:p-8">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
           <button
             onClick={() => navigate("/dashboard")}
-            className="flex items-center gap-2 text-gray-300 hover:text-white transition-colors"
+            className={`flex items-center gap-2 ${theme.textMuted} hover:text-white transition-colors`}
           >
             <ArrowLeft size={20} />
             <span>Back to Dashboard</span>
@@ -129,17 +131,17 @@ export default function NoteEditor() {
 
           <button
             onClick={() => navigate("/dashboard")}
-            className="text-gray-300 hover:text-white transition-colors"
+            className={`${theme.textMuted} hover:text-white transition-colors`}
           >
             <X size={24} />
           </button>
         </div>
 
         {/* Title */}
-        <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-orange-400 to-pink-500 bg-clip-text text-transparent mb-2 text-center">
+        <h1 className={`text-3xl md:text-4xl font-bold ${theme.gradientText} mb-2 text-center`}>
           {isEditing ? "Edit Note" : "Create New Note"}
         </h1>
-        <p className="text-center text-gray-300 mb-8">
+        <p className={`text-center ${theme.textMuted} mb-8`}>
           {isEditing ? "Update your note" : "Write something amazing"}
         </p>
 
@@ -148,7 +150,7 @@ export default function NoteEditor() {
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-green-500/20 border border-green-500/50 text-green-200 p-3 rounded-xl mb-6 text-center"
+            className={`${theme.success} p-3 rounded-xl mb-6 text-center`}
           >
             {success}
           </motion.div>
@@ -159,7 +161,7 @@ export default function NoteEditor() {
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-red-500/20 border border-red-500/50 text-red-200 p-3 rounded-xl mb-6 text-center"
+            className={`${theme.error} p-3 rounded-xl mb-6 text-center`}
           >
             {error}
           </motion.div>
@@ -169,12 +171,12 @@ export default function NoteEditor() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-3xl p-6 md:p-8 shadow-2xl"
+          className={`backdrop-blur-xl ${theme.card} border rounded-3xl p-6 md:p-8 shadow-2xl`}
         >
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Title Input */}
             <div>
-              <label className="text-sm text-gray-300 mb-2 block font-medium">
+              <label className={`text-sm ${theme.textMuted} mb-2 block font-medium`}>
                 Title
               </label>
               <input
@@ -184,16 +186,16 @@ export default function NoteEditor() {
                 onChange={handleChange}
                 placeholder="Enter note title..."
                 maxLength={200}
-                className="w-full p-4 rounded-xl bg-white/5 border border-white/20 text-white text-xl font-semibold placeholder-gray-400 outline-none focus:border-orange-400 focus:bg-white/10 transition-all"
+                className={`w-full p-4 rounded-xl ${theme.input} ${theme.text} text-xl font-semibold placeholder-gray-500 outline-none transition-all`}
               />
-              <p className="text-xs text-gray-400 mt-1">
+              <p className={`text-xs ${theme.textMuted} mt-1`}>
                 {noteData.title.length}/200 characters
               </p>
             </div>
 
             {/* Content Textarea */}
             <div>
-              <label className="text-sm text-gray-300 mb-2 block font-medium">
+              <label className={`text-sm ${theme.textMuted} mb-2 block font-medium`}>
                 Content
               </label>
               <textarea
@@ -202,9 +204,9 @@ export default function NoteEditor() {
                 onChange={handleChange}
                 placeholder="Start writing your note..."
                 rows={15}
-                className="w-full p-4 rounded-xl bg-white/5 border border-white/20 text-white placeholder-gray-400 outline-none focus:border-orange-400 focus:bg-white/10 transition-all resize-none"
+                className={`w-full p-4 rounded-xl ${theme.input} ${theme.text} placeholder-gray-500 outline-none transition-all resize-none`}
               />
-              <p className="text-xs text-gray-400 mt-1">
+              <p className={`text-xs ${theme.textMuted} mt-1`}>
                 {noteData.content.length} characters
               </p>
             </div>
@@ -216,7 +218,7 @@ export default function NoteEditor() {
                 whileTap={{ scale: 0.98 }}
                 type="submit"
                 disabled={loading}
-                className="flex-1 flex items-center justify-center gap-2 p-4 rounded-xl bg-gradient-to-r from-orange-600 to-pink-500 text-white font-semibold disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-orange-500/30 hover:shadow-orange-500/50 transition-all"
+                className={`flex-1 flex items-center justify-center gap-2 p-4 rounded-xl ${theme.button} ${theme.buttonHover} text-white font-semibold disabled:opacity-50 disabled:cursor-not-allowed shadow-lg transition-all`}
               >
                 <Save size={20} />
                 {loading ? "Saving..." : (isEditing ? "Update Note" : "Create Note")}
@@ -225,13 +227,14 @@ export default function NoteEditor() {
               <button
                 type="button"
                 onClick={() => navigate("/dashboard")}
-                className="px-8 py-4 rounded-xl bg-white/10 hover:bg-white/20 text-white font-medium transition-colors"
+                className={`px-8 py-4 rounded-xl ${theme.buttonSecondary} ${theme.text} font-medium transition-colors`}
               >
                 Cancel
               </button>
             </div>
           </form>
         </motion.div>
+      </div>
       </div>
     </div>
   );

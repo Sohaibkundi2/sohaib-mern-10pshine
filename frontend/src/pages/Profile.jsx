@@ -5,22 +5,19 @@ import { ArrowLeft, Edit, LogOut, Mail, Calendar, FileText } from "lucide-react"
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { profileAPI } from "../services/api";
-import dayjs from "dayjs";
+import { theme } from "../utils/theme";
+import Navbar from "../components/Navbar";
 import LogoutModal from "../components/LogoutModal";
+import dayjs from "dayjs";
 
 export default function Profile() {
   const navigate = useNavigate();
-  const { user: contextUser, logout } = useAuth();
+  const { user: contextUser } = useAuth();
   
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
-
-  const handleLogout = async () => {
-    await logout();
-    navigate("/login");
-  };
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   useEffect(() => {
     fetchProfile();
@@ -46,16 +43,16 @@ export default function Profile() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-zinc-900 via-orange-900/40 to-rose-900/30 flex items-center justify-center">
-        <div className="text-white text-xl">Loading profile...</div>
+      <div className={`min-h-screen bg-gradient-to-br ${theme.background} flex items-center justify-center`}>
+        <div className={`${theme.text} text-xl`}>Loading profile...</div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-zinc-900 via-orange-900/40 to-rose-900/30 flex items-center justify-center p-4">
-        <div className="bg-red-500/20 border border-red-500/50 text-red-200 p-4 rounded-xl">
+      <div className={`min-h-screen bg-gradient-to-br ${theme.background} flex items-center justify-center p-4`}>
+        <div className={`${theme.error} p-4 rounded-xl`}>
           {error}
         </div>
       </div>
@@ -65,27 +62,33 @@ export default function Profile() {
   const userData = profile || contextUser;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-zinc-900 via-orange-900/40 to-rose-900/30 p-4 md:p-8">
-      <div className="max-w-4xl mx-auto">
-        {/* Back Button */}
-        <button
+    <div className={`min-h-screen bg-gradient-to-br ${theme.background} text-white`}>
+      {/* Navbar */}
+      <Navbar showSearch={false} />
+
+      {/* Main Content */}
+      <div className="pt-20 p-4 md:p-8">
+
+         <button
           onClick={() => navigate("/dashboard")}
-          className="flex items-center gap-2 text-gray-300 hover:text-white mb-6 transition-colors"
+          className={`flex items-center gap-2 ${theme.textMuted} hover:text-white m-2 md:m-5  md:mt-15 transition-colors`}
         >
           <ArrowLeft size={20} />
           <span>Back to Dashboard</span>
         </button>
 
+      <div className="max-w-4xl mx-auto">
+
         {/* Profile Card */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-3xl overflow-hidden shadow-2xl shadow-orange-500/20"
+          className={`backdrop-blur-xl ${theme.card} border rounded-3xl overflow-hidden shadow-2xl`}
         >
           {/* Header Section */}
-          <div className="relative h-32 bg-gradient-to-r from-orange-600 via-pink-600 to-rose-600">
+          <div className="relative h-32 bg-gradient-to-r from-orange-600 to-pink-600">
             <div className="absolute -bottom-16 left-8">
-              <div className="w-32 h-32 rounded-full border-4 border-white/30 overflow-hidden bg-gradient-to-br from-orange-500 to-pink-500 flex items-center justify-center shadow-xl">
+              <div className="w-32 h-32 rounded-full border-4 border-slate-900 overflow-hidden bg-gradient-to-br from-orange-500 to-pink-500 flex items-center justify-center shadow-xl">
                 {userData?.avatar ? (
                   <img
                     src={userData.avatar}
@@ -105,10 +108,10 @@ export default function Profile() {
           <div className="pt-20 p-8">
             <div className="flex justify-between items-start mb-6">
               <div>
-                <h1 className="text-3xl font-bold text-white mb-2">
+                <h1 className={`text-3xl font-bold ${theme.text} mb-2`}>
                   {userData?.fullName || "User Name"}
                 </h1>
-                <p className="text-gray-300">@{userData?.username || "username"}</p>
+                <p className={theme.textMuted}>@{userData?.username || "username"}</p>
               </div>
               
               <div className="flex gap-3">
@@ -116,7 +119,7 @@ export default function Profile() {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => navigate("/update-profile")}
-                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-orange-600 to-pink-500 text-white shadow-lg hover:shadow-orange-500/50 transition-all"
+                  className={`flex items-center gap-2 px-4 py-2 rounded-xl ${theme.button} ${theme.buttonHover} text-white shadow-lg transition-all`}
                 >
                   <Edit size={18} />
                   <span className="hidden sm:inline">Edit Profile</span>
@@ -125,8 +128,8 @@ export default function Profile() {
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  onClick={() => setShowLogoutConfirm(true)}
-                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-red-500/20 border border-red-500/50 text-red-300 hover:bg-red-500/30 transition-all"
+                  onClick={() => setShowLogoutModal(true)}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-xl ${theme.error} border transition-all`}
                 >
                   <LogOut size={18} />
                   <span className="hidden sm:inline">Logout</span>
@@ -136,19 +139,19 @@ export default function Profile() {
 
             {/* Profile Details */}
             <div className="grid md:grid-cols-2 gap-4 mb-8">
-              <div className="flex items-center gap-3 p-4 rounded-xl bg-white/5 border border-white/10">
+              <div className={`flex items-center gap-3 p-4 rounded-xl ${theme.card} border`}>
                 <Mail size={20} className="text-orange-400" />
                 <div>
-                  <p className="text-xs text-gray-400">Email</p>
-                  <p className="text-white">{userData?.email || "Not provided"}</p>
+                  <p className={`text-xs ${theme.textMuted}`}>Email</p>
+                  <p className={theme.text}>{userData?.email || "Not provided"}</p>
                 </div>
               </div>
 
-              <div className="flex items-center gap-3 p-4 rounded-xl bg-white/5 border border-white/10">
+              <div className={`flex items-center gap-3 p-4 rounded-xl ${theme.card} border`}>
                 <Calendar size={20} className="text-pink-400" />
                 <div>
-                  <p className="text-xs text-gray-400">Member Since</p>
-                  <p className="text-white">
+                  <p className={`text-xs ${theme.textMuted}`}>Member Since</p>
+                  <p className={theme.text}>
                     {userData?.createdAt
                       ? dayjs(userData.createdAt).format("MMMM D, YYYY")
                       : "Recently"}
@@ -156,11 +159,11 @@ export default function Profile() {
                 </div>
               </div>
 
-              <div className="flex items-center gap-3 p-4 rounded-xl bg-white/5 border border-white/10">
+              <div className={`flex items-center gap-3 p-4 rounded-xl ${theme.card} border`}>
                 <FileText size={20} className="text-rose-400" />
                 <div>
-                  <p className="text-xs text-gray-400">Total Notes</p>
-                  <p className="text-white font-semibold">
+                  <p className={`text-xs ${theme.textMuted}`}>Total Notes</p>
+                  <p className={`${theme.text} font-semibold`}>
                     {userData?.notesCount || 0} notes
                   </p>
                 </div>
@@ -168,20 +171,20 @@ export default function Profile() {
             </div>
 
             {/* Additional Info */}
-            <div className="border-t border-white/10 pt-6">
-              <h3 className="text-lg font-semibold text-white mb-4">Account Information</h3>
+            <div className={`border-t ${theme.border} pt-6`}>
+              <h3 className={`text-lg font-semibold ${theme.text} mb-4`}>Account Information</h3>
               <div className="space-y-3 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-gray-400">Username</span>
-                  <span className="text-white">@{userData?.username}</span>
+                  <span className={theme.textMuted}>Username</span>
+                  <span className={theme.text}>@{userData?.username}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-400">Full Name</span>
-                  <span className="text-white">{userData?.fullName}</span>
+                  <span className={theme.textMuted}>Full Name</span>
+                  <span className={theme.text}>{userData?.fullName}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-400">Email</span>
-                  <span className="text-white">{userData?.email}</span>
+                  <span className={theme.textMuted}>Email</span>
+                  <span className={theme.text}>{userData?.email}</span>
                 </div>
               </div>
             </div>
@@ -189,14 +192,12 @@ export default function Profile() {
         </motion.div>
       </div>
 
-      {/* Logout Confirmation Modal */}
-
+      {/* Logout Modal */}
       <LogoutModal 
-        isOpen={showLogoutConfirm} 
-        onClose={() => setShowLogoutConfirm(false)} 
-        onConfirm={handleLogout} 
+        isOpen={showLogoutModal}
+        onClose={() => setShowLogoutModal(false)}
       />
-    
+      </div>
     </div>
   );
 }
