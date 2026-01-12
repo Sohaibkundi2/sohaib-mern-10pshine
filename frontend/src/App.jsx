@@ -7,6 +7,7 @@ import Dashboard from './pages/Dashboard';
 import Profile from './pages/Profile';
 import UpdateProfile from './pages/UpdateProfile';
 import NoteEditor from './pages/NoteEditor';
+import About from './pages/About';
 
 // Protected Route Component
 function ProtectedRoute({ children }) {
@@ -111,6 +112,9 @@ function AppRoutes() {
             </ProtectedRoute>
           } 
         />
+
+        {/* About Page (Public) */}
+        <Route path="/about" element={<About />} />
 
         {/* Default Routes */}
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
