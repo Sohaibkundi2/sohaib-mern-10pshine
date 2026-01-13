@@ -2,10 +2,12 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Login from './pages/Login';
-import Register from './pages/signup';
-import Dashboard from './pages/AppUI';
+import Register from './pages/Register';
+import Dashboard from './pages/Dashboard';
 import Profile from './pages/Profile';
 import UpdateProfile from './pages/UpdateProfile';
+import NoteEditor from './pages/NoteEditor';
+import About from './pages/About';
 
 // Protected Route Component
 function ProtectedRoute({ children }) {
@@ -92,6 +94,27 @@ function AppRoutes() {
             </ProtectedRoute>
           } 
         />
+        
+        {/* Note Routes */}
+        <Route 
+          path="/notes/new" 
+          element={
+            <ProtectedRoute>
+              <NoteEditor />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/notes/edit/:id" 
+          element={
+            <ProtectedRoute>
+              <NoteEditor />
+            </ProtectedRoute>
+          } 
+        />
+
+        {/* About Page (Public) */}
+        <Route path="/about" element={<About />} />
 
         {/* Default Routes */}
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
