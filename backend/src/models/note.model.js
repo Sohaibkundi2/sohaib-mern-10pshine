@@ -17,9 +17,14 @@ const noteSchema = new Schema(
       type: String,
       required: true,
       trim: true,
-    }
+    },
+    isFavorite: {
+      type: Boolean,
+      default: false,
+      index: true,
+    },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 export const Note = mongoose.model("Note", noteSchema);

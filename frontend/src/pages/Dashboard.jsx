@@ -55,6 +55,23 @@ export default function Dashboard() {
   const handleDeleteClick = (note) => setDeleteModal({ isOpen: true, note });
   const handleDeleteSuccess = () => fetchNotes();
 
+  const handleToggleFavorite = async (noteId) => {
+    try {
+      await notesAPI.toggleFavorite(noteId);
+      // Update the note in state immediately for better UX
+      setNotes(prevNotes => 
+        prevNotes.map(note => 
+          note._id === noteId 
+            ? { ...note, isFavorite: !note.isFavorite }
+            : note
+        )
+      );
+    } catch (err) {
+      console.error("Failed to toggle favorite:", err);
+      // Optionally show error toast/notification
+    }
+  };
+
   const filteredNotes = notes.filter(note => {
     if (activeFilter === "favorites") return note.isFavorite;
     if (activeFilter === "archived") return note.isArchived;
@@ -94,7 +111,7 @@ export default function Dashboard() {
           <span className={theme.textMuted}>{stats.total} Notes</span>
         </div>
 
-        <ProfileMenu />
+        <ProfileMenu stats={stats} />
       </nav>
 
       {/* Mobile Sidebar */}
@@ -346,36 +363,75 @@ export default function Dashboard() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.03 }}
-                className={`p-4 rounded-2xl backdrop-blur-sm ${theme.card} border ${theme.cardHover} shadow-lg transition-all cursor-pointer group`}
+                className={`relative p-5 rounded-2xl backdrop-blur-sm ${theme.card} border ${theme.cardHover} shadow-lg transition-all group`}
               >
-                <div className="flex justify-between items-start mb-2">
-                  <h3 className={`font-semibold text-base bg-gradient-to-r from-orange-400 to-pink-400 bg-clip-text text-transparent line-clamp-1 flex-1`}>
+                {/* Favorite Badge - Top Right */}
+                <div className="absolute top-4 right-4">
+                  <button 
+                    onClick={(e) => { 
+                      e.stopPropagation(); 
+                      handleToggleFavorite(note._id); 
+                    }}
+                    className={`transition-all p-1.5 rounded-lg cursor-pointer ${
+                      note.isFavorite 
+                        ? 'text-pink-500 hover:text-pink-600 hover:bg-pink-500/10' 
+                        : 'text-gray-400 hover:text-pink-400 hover:bg-pink-500/10'
+                    }`}
+                    title={note.isFavorite ? "Remove from favorites" : "Add to favorites"}
+                  >
+                    <Star 
+                      size={20} 
+                      fill={note.isFavorite ? "currentColor" : "none"}
+                      strokeWidth={2}
+                    />
+                  </button>
+                </div>
+
+                {/* Content Area - Clickable */}
+                <div 
+                  onClick={() => handleEditNote(note._id)}
+                  className="cursor-pointer pr-8"
+                >
+                  <h3 className={`font-semibold text-lg bg-gradient-to-r from-orange-400 to-pink-400 bg-clip-text text-transparent line-clamp-2 mb-2`}>
                     {note.title}
                   </h3>
-                  <span className={`text-xs  ${theme.textMuted} whitespace-nowrap ml-2`}>
-                    {dayjs(note.createdAt).format("h:mm A, DD MMM")}
-                  </span>
+                  
+                  <p className={`text-sm line-clamp-4 ${theme.textMuted} mb-4`}>
+                    {note.content}
+                  </p>
                 </div>
-                <p className={`text-sm mt-2 line-clamp-3 ${theme.textMuted}`}>
-                  {note.content}
-                </p>
 
-                <div className={`flex justify-end gap-3 mt-4 ${theme.textMuted}`}>
-                  <button 
-                    onClick={(e) => { e.stopPropagation(); handleEditNote(note._id); }}
-                    className="hover:text-orange-400 transition-colors p-1"
-                    title="Edit note"
-                  >
-                    <Edit size={18} />
-                  </button>
+                {/* Footer */}
+                <div className="flex items-center justify-between pt-3 border-t border-white/10">
+                  <span className={`text-xs ${theme.textMuted} flex items-center gap-1`}>
+                    {dayjs(note.createdAt).format("MMM DD, YYYY")}
+                  </span>
 
-                  <button 
-                    onClick={(e) => { e.stopPropagation(); handleDeleteClick(note); }}
-                    className="hover:text-red-400 transition-colors p-1"
-                    title="Delete note"
-                  >
-                    <Trash2 size={18} />
-                  </button>
+                  <div className="flex items-center gap-2">
+                    {/* Edit Button */}
+                    <button 
+                      onClick={(e) => { 
+                        e.stopPropagation(); 
+                        handleEditNote(note._id); 
+                      }}
+                      className="p-2 rounded-lg hover:bg-orange-500/10 hover:text-orange-400 transition-all cursor-pointer"
+                      title="Edit note"
+                    >
+                      <Edit size={16} />
+                    </button>
+
+                    {/* Delete Button */}
+                    <button 
+                      onClick={(e) => { 
+                        e.stopPropagation(); 
+                        handleDeleteClick(note); 
+                      }}
+                      className="p-2 rounded-lg hover:bg-red-500/10 hover:text-red-400 transition-all cursor-pointer"
+                      title="Delete note"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
                 </div>
               </motion.div>
             ))}
@@ -388,7 +444,7 @@ export default function Dashboard() {
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.95 }}
         onClick={handleCreateNote}
-        className={` w-14 h-14 rounded-full ${theme.button} border border-white/20 fixed bottom-6 right-6 flex items-center justify-center text-3xl font-light shadow-2xl z-30`}
+        className={`w-14 h-14 rounded-full ${theme.button} border border-white/20 fixed bottom-6 right-6 flex items-center justify-center text-3xl font-light shadow-2xl z-30`}
       >
         +
       </motion.button>

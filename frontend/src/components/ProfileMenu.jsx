@@ -1,14 +1,14 @@
 // src/components/ProfileMenu.jsx
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { User, LogOut, Settings, Bell } from "lucide-react";
+import { User, LogOut, Settings, Bell, Star } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { theme } from "../utils/theme";
 import LogoutModal from "./LogoutModal";
 import dayjs from "dayjs";
 
-export default function ProfileMenu() {
+export default function ProfileMenu({ stats }) {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [showProfileMenu, setShowProfileMenu] = useState(false);
@@ -19,7 +19,6 @@ export default function ProfileMenu() {
     name: user?.fullName || "User",
     email: user?.email || "user@example.com",
     avatar: user?.avatar || null,
-    notesCount: user?.notesCount || 0,
     joinedDate: user?.createdAt 
       ? dayjs(user.createdAt).format("MMM YYYY")
       : "Recently"
@@ -95,10 +94,14 @@ export default function ProfileMenu() {
                 </div>
                 
                 {/* Stats */}
-                <div className="flex gap-4 mt-3 text-xs">
+                <div className="grid grid-cols-3 gap-3 mt-3 text-xs">
                   <div>
                     <span className={theme.textMuted}>Notes</span>
-                    <p className="font-semibold text-orange-400">{userData.notesCount}</p>
+                    <p className="font-semibold text-orange-400">{stats?.total || 0}</p>
+                  </div>
+                  <div>
+                    <span className={theme.textMuted}>Favorites</span>
+                    <p className="font-semibold text-pink-400">{stats?.favorites || 0}</p>
                   </div>
                   <div>
                     <span className={theme.textMuted}>Joined</span>

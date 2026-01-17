@@ -20,7 +20,14 @@ const createNote = asyncHandler(async (req, res) => {
 });
 
 const getAllNotes = asyncHandler(async (req, res) => {
-  const notes = await Note.find({ owner: req.user._id }).sort({ createdAt: -1 });
+  const { favorite } = req.query; // optional query param
+  
+  const filter = { owner: req.user._id };
+  if (favorite === 'true') {
+    filter.isFavorite = true;
+  }
+  
+  const notes = await Note.find(filter).sort({ createdAt: -1 });
 
   logger.info({ count: notes.length, userId: req.user._id }, "Fetched all notes");
 
@@ -60,4 +67,30 @@ const deleteNote = asyncHandler(async (req, res) => {
   res.status(200).json(new ApiResponse(200, null, "Note deleted successfully"));
 });
 
-export { createNote, getAllNotes, getNoteById, updateNote, deleteNote };
+const toggleFavorite = asyncHandler(async (req, res) => {
+  const note = await Note.findOne({
+    _id: req.params.id,
+    owner: req.user._id
+  });
+
+  if (!note) {
+    throw new ApiError(404, 'Note not found');
+  }
+
+  // Toggle the favorite status
+  note.isFavorite = !note.isFavorite;
+  await note.save();
+
+  logger.info({ 
+    noteId: note._id, 
+    userId: req.user._id,
+    isFavorite: note.isFavorite 
+  }, 'Note favorite toggled');
+
+  res.status(200).json(
+    new ApiResponse(200, note, `Note ${note.isFavorite ? 'added to' : 'removed from'} favorites`)
+  );
+});
+
+
+export { createNote, getAllNotes, getNoteById, updateNote, deleteNote, toggleFavorite  };
