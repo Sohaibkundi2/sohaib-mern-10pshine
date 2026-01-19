@@ -1,6 +1,8 @@
+// src/pages/Login.jsx
 import { useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { motion } from "framer-motion"
+import { Mail, Lock, Eye, EyeOff } from "lucide-react"
 import { authAPI } from "../services/api"
 import { useAuth } from "../context/AuthContext"
 import { theme } from "../utils/theme"
@@ -11,6 +13,7 @@ export default function Login() {
 
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
+    const [showPassword, setShowPassword] = useState(false)
     const [error, setError] = useState("")
     const [loading, setLoading] = useState(false)
 
@@ -96,24 +99,45 @@ export default function Login() {
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
                         <label className={`text-sm ${theme.textMuted} mb-1 block`}>Email</label>
-                        <input
-                            type="email"
-                            placeholder="your@email.com"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            className={`w-full p-3 rounded-xl ${theme.input} ${theme.text} placeholder-gray-500 outline-none transition-all`}
-                        />
+                        <div className="relative">
+                            <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                            <input
+                                type="email"
+                                placeholder="your@email.com"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                className={`w-full p-3 pl-10 rounded-xl ${theme.input} ${theme.text} placeholder-gray-500 outline-none transition-all focus:ring-2 focus:ring-orange-500/50`}
+                            />
+                        </div>
                     </div>
 
                     <div>
-                        <label className={`text-sm ${theme.textMuted} mb-1 block`}>Password</label>
-                        <input
-                            type="password"
-                            placeholder="••••••••"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            className={`w-full p-3 rounded-xl ${theme.input} ${theme.text} placeholder-gray-500 outline-none transition-all`}
-                        />
+                        <div className="flex justify-between items-center mb-1">
+                            <label className={`text-sm ${theme.textMuted}`}>Password</label>
+                            <Link 
+                                to="/forgot-password" 
+                                className="text-sm text-orange-400 hover:text-orange-300 transition-colors"
+                            >
+                                Forgot Password?
+                            </Link>
+                        </div>
+                        <div className="relative">
+                            <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                            <input
+                                type={showPassword ? "text" : "password"}
+                                placeholder="••••••••"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                className={`w-full p-3 pl-10 pr-10 rounded-xl ${theme.input} ${theme.text} placeholder-gray-500 outline-none transition-all focus:ring-2 focus:ring-orange-500/50`}
+                            />
+                            <button
+                                type="button"
+                                onClick={() => setShowPassword(!showPassword)}
+                                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-orange-400 transition-colors"
+                            >
+                                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                            </button>
+                        </div>
                     </div>
 
                     <motion.button

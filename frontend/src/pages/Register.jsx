@@ -1,6 +1,8 @@
+// src/pages/Register.jsx
 import { useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { motion } from "framer-motion"
+import { User, AtSign, Mail, Lock, Eye, EyeOff, Upload } from "lucide-react"
 import { authAPI } from "../services/api"
 import { theme } from "../utils/theme"
 
@@ -17,6 +19,8 @@ export default function Register() {
 
     const [avatar, setAvatar] = useState(null)
     const [avatarPreview, setAvatarPreview] = useState(null)
+    const [showPassword, setShowPassword] = useState(false)
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false)
     const [error, setError] = useState("")
     const [loading, setLoading] = useState(false)
 
@@ -134,12 +138,12 @@ export default function Register() {
                 <form onSubmit={handleSubmit} className="space-y-4">
                     {/* Avatar Upload */}
                     <div className="flex flex-col items-center mb-4">
-                        <label className="cursor-pointer">
-                            <div className={`w-24 h-24 rounded-full bg-gradient-to-r from-orange-500/20 to-pink-500/20 border-2 border-dashed ${theme.border} hover:border-orange-400 flex items-center justify-center transition-all overflow-hidden`}>
+                        <label className="cursor-pointer group">
+                            <div className={`w-24 h-24 rounded-full bg-gradient-to-r from-orange-500/20 to-pink-500/20 border-2 border-dashed ${theme.border} hover:border-orange-400 flex items-center justify-center transition-all overflow-hidden group-hover:scale-105`}>
                                 {avatarPreview ? (
                                     <img src={avatarPreview} alt="Avatar" className="w-full h-full object-cover" />
                                 ) : (
-                                    <span className="text-3xl">📷</span>
+                                    <Upload className="text-orange-400" size={32} />
                                 )}
                             </div>
                             <input
@@ -154,62 +158,91 @@ export default function Register() {
 
                     <div>
                         <label className={`text-sm ${theme.textMuted} mb-1 block`}>Full Name</label>
-                        <input
-                            type="text"
-                            name="fullName"
-                            placeholder="John Doe"
-                            value={formData.fullName}
-                            onChange={handleChange}
-                            className={`w-full p-3 rounded-xl ${theme.input} ${theme.text} placeholder-gray-500 outline-none transition-all`}
-                        />
+                        <div className="relative">
+                            <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                            <input
+                                type="text"
+                                name="fullName"
+                                placeholder="John Doe"
+                                value={formData.fullName}
+                                onChange={handleChange}
+                                className={`w-full p-3 pl-10 rounded-xl ${theme.input} ${theme.text} placeholder-gray-500 outline-none transition-all focus:ring-2 focus:ring-orange-500/50`}
+                            />
+                        </div>
                     </div>
 
                     <div>
                         <label className={`text-sm ${theme.textMuted} mb-1 block`}>Username</label>
-                        <input
-                            type="text"
-                            name="username"
-                            placeholder="johndoe123"
-                            value={formData.username}
-                            onChange={handleChange}
-                            className={`w-full p-3 rounded-xl ${theme.input} ${theme.text} placeholder-gray-500 outline-none transition-all`}
-                        />
+                        <div className="relative">
+                            <AtSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                            <input
+                                type="text"
+                                name="username"
+                                placeholder="johndoe123"
+                                value={formData.username}
+                                onChange={handleChange}
+                                className={`w-full p-3 pl-10 rounded-xl ${theme.input} ${theme.text} placeholder-gray-500 outline-none transition-all focus:ring-2 focus:ring-orange-500/50`}
+                            />
+                        </div>
                     </div>
 
                     <div>
                         <label className={`text-sm ${theme.textMuted} mb-1 block`}>Email</label>
-                        <input
-                            type="email"
-                            name="email"
-                            placeholder="john@example.com"
-                            value={formData.email}
-                            onChange={handleChange}
-                            className={`w-full p-3 rounded-xl ${theme.input} ${theme.text} placeholder-gray-500 outline-none transition-all`}
-                        />
+                        <div className="relative">
+                            <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                            <input
+                                type="email"
+                                name="email"
+                                placeholder="john@example.com"
+                                value={formData.email}
+                                onChange={handleChange}
+                                className={`w-full p-3 pl-10 rounded-xl ${theme.input} ${theme.text} placeholder-gray-500 outline-none transition-all focus:ring-2 focus:ring-orange-500/50`}
+                            />
+                        </div>
                     </div>
 
                     <div>
                         <label className={`text-sm ${theme.textMuted} mb-1 block`}>Password</label>
-                        <input
-                            type="password"
-                            name="password"
-                            placeholder="••••••••"
-                            value={formData.password}
-                            onChange={handleChange}
-                            className={`w-full p-3 rounded-xl ${theme.input} ${theme.text} placeholder-gray-500 outline-none transition-all`}
-                        />
+                        <div className="relative">
+                            <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                            <input
+                                type={showPassword ? "text" : "password"}
+                                name="password"
+                                placeholder="••••••••"
+                                value={formData.password}
+                                onChange={handleChange}
+                                className={`w-full p-3 pl-10 pr-10 rounded-xl ${theme.input} ${theme.text} placeholder-gray-500 outline-none transition-all focus:ring-2 focus:ring-orange-500/50`}
+                            />
+                            <button
+                                type="button"
+                                onClick={() => setShowPassword(!showPassword)}
+                                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-orange-400 transition-colors"
+                            >
+                                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                            </button>
+                        </div>
                     </div>
 
                     <div>
                         <label className={`text-sm ${theme.textMuted} mb-1 block`}>Confirm Password</label>
-                        <input
-                            type="password"
-                            name="confirmPassword"
-                            placeholder="••••••••"
-                            value={formData.confirmPassword}
-                            onChange={handleChange}
-                            className={`w-full p-3 rounded-xl ${theme.input} ${theme.text} placeholder-gray-500 outline-none transition-all`}
-                        />
+                        <div className="relative">
+                            <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                            <input
+                                type={showConfirmPassword ? "text" : "password"}
+                                name="confirmPassword"
+                                placeholder="••••••••"
+                                value={formData.confirmPassword}
+                                onChange={handleChange}
+                                className={`w-full p-3 pl-10 pr-10 rounded-xl ${theme.input} ${theme.text} placeholder-gray-500 outline-none transition-all focus:ring-2 focus:ring-orange-500/50`}
+                            />
+                            <button
+                                type="button"
+                                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-orange-400 transition-colors"
+                            >
+                                {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                            </button>
+                        </div>
                     </div>
 
                     <motion.button
