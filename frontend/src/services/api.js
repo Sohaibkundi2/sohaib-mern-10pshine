@@ -128,6 +128,9 @@ export const notesAPI = {
   // Delete note
   delete: (id) => api.delete(`/notes/${id}`),
 
+  // Toggle favorite status
+  toggleFavorite: (id) => api.patch(`/notes/${id}/favorite`),
+
 };
 
 export default api;
