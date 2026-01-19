@@ -4,6 +4,8 @@ import { ApiResponse } from "../utils/apiResponce.js";
 import { User } from "../models/user.model.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import logger from "../utils/logger.js";
+import crypto from 'crypto'
+import sendEmail, { getPasswordResetEmailTemplate } from '../utils/sendEmail.js'
 
 const registerUser = asyncHandler(async (req, res) => {
   const { username, fullName, email, password } = req.body || {};
@@ -197,9 +199,146 @@ const logoutUser = asyncHandler(async (req, res) => {
 });
 
 
+// Forgot Password - Send reset email
+ const forgotPassword = asyncHandler(async (req, res) => {
+  const { email } = req.body
+
+  if (!email) {
+    throw new ApiError(400, 'Email is required')
+  }
+
+  const user = await User.findOne({ email: email.toLowerCase() })
+
+  if (!user) {
+    // Don't reveal if email exists or not (security best practice)
+    return res.status(200).json(
+      new ApiResponse(
+        200,
+        {},
+        'If that email exists, a password reset link has been sent'
+      )
+    )
+  }
+
+  // Generate reset token
+  const resetToken = user.generatePasswordResetToken()
+  await user.save({ validateBeforeSave: false })
+
+  // Create reset URL
+  const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`
+
+  try {
+    // Send email
+    await sendEmail({
+      email: user.email,
+      subject: 'Password Reset Request - Glass Notes',
+      html: getPasswordResetEmailTemplate(resetUrl, user.fullName || user.username),
+    })
+
+    logger.info({ userId: user._id }, 'Password reset email sent')
+
+    res.status(200).json(
+      new ApiResponse(
+        200,
+        {},
+        'Password reset link sent to your email'
+      )
+    )
+  } catch (error) {
+    // If email fails, clear reset token
+    user.resetPasswordToken = undefined
+    user.resetPasswordExpires = undefined
+    await user.save({ validateBeforeSave: false })
+
+    logger.error({ err: error }, 'Error sending password reset email')
+    throw new ApiError(500, 'Error sending email. Please try again later.')
+  }
+})
+
+// Reset Password - Validate token and update password
+const resetPassword = asyncHandler(async (req, res) => {
+  const { token } = req.params
+  const { password } = req.body
+
+  if (!password) {
+    throw new ApiError(400, 'Password is required')
+  }
+
+  if (password.length < 6) {
+    throw new ApiError(400, 'Password must be at least 6 characters')
+  }
+
+  // Hash the token to compare with database
+  const hashedToken = crypto
+    .createHash('sha256')
+    .update(token)
+    .digest('hex')
+
+  // Find user with valid token that hasn't expired
+  const user = await User.findOne({
+    resetPasswordToken: hashedToken,
+    resetPasswordExpires: { $gt: Date.now() },
+  })
+
+  if (!user) {
+    throw new ApiError(400, 'Invalid or expired reset token')
+  }
+
+  // Update password
+  user.password = password
+  user.resetPasswordToken = undefined
+  user.resetPasswordExpires = undefined
+  
+  // Increment refresh token version to invalidate all existing tokens
+  user.refreshTokenVersion += 1
+  user.refreshToken = ''
+
+  await user.save()
+
+  logger.info({ userId: user._id }, 'Password reset successful')
+
+  res.status(200).json(
+    new ApiResponse(
+      200,
+      {},
+      'Password reset successful. Please login with your new password.'
+    )
+  )
+})
+
+// Verify Reset Token - Check if token is valid (optional, for better UX)
+const verifyResetToken = asyncHandler(async (req, res) => {
+  const { token } = req.params
+
+  const hashedToken = crypto
+    .createHash('sha256')
+    .update(token)
+    .digest('hex')
+
+  const user = await User.findOne({
+    resetPasswordToken: hashedToken,
+    resetPasswordExpires: { $gt: Date.now() },
+  })
+
+  if (!user) {
+    throw new ApiError(400, 'Invalid or expired reset token')
+  }
+
+  res.status(200).json(
+    new ApiResponse(
+      200,
+      { email: user.email },
+      'Token is valid'
+    )
+  )
+})
 
 export { registerUser, 
   loginUser, 
   generateAccessRefreshToken ,
   generateAccessAndRefreshToken,
-  logoutUser};
+  logoutUser,
+  forgotPassword,
+  resetPassword,
+  verifyResetToken
+};

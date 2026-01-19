@@ -1,6 +1,8 @@
+// models/user.model.js
 import mongoose, { Schema } from 'mongoose'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
+import crypto from 'crypto'
 
 const userSchema = new Schema(
   {
@@ -25,7 +27,7 @@ const userSchema = new Schema(
       trim: true,
     },
     avatar: {
-      type: String, // Cloudinary URL (optional for Notes app)
+      type: String,
       default: '',
     },
     password: {
@@ -45,7 +47,16 @@ const userSchema = new Schema(
     refreshTokenVersion: {
       type: Number,
       default: 0,
-    }
+    },
+    // NEW: Password reset fields
+    resetPasswordToken: {
+      type: String,
+      default: undefined,
+    },
+    resetPasswordExpires: {
+      type: Date,
+      default: undefined,
+    },
   },
   { timestamps: true },
 )
@@ -89,7 +100,22 @@ userSchema.methods.generateRefreshToken = function () {
   )
 }
 
-
-
+// NEW: Generate Password Reset Token
+userSchema.methods.generatePasswordResetToken = function () {
+  // Generate random token
+  const resetToken = crypto.randomBytes(32).toString('hex')
+  
+  // Hash token and set to resetPasswordToken field
+  this.resetPasswordToken = crypto
+    .createHash('sha256')
+    .update(resetToken)
+    .digest('hex')
+  
+  // Set expire time (10 minutes)
+  this.resetPasswordExpires = Date.now() + 10 * 60 * 1000
+  
+  // Return unhashed token (this will be sent via email)
+  return resetToken
+}
 
 export const User = mongoose.model('User', userSchema)
