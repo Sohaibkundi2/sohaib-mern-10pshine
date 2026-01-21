@@ -176,10 +176,10 @@ export default function UpdateProfile() {
       <div className="pt-20 p-4 md:p-8">
       <div className="max-w-3xl mx-auto">
         {/* Header */}
-        <div className="flex justify-between items-center mb-6">
+        <div className="flex justify-between items-center md:mt-14 mb-6 md:mb-0">
           <button
             onClick={() => navigate("/profile")}
-            className={`flex items-center gap-2 ${theme.textMuted} hover:text-white transition-colors`}
+            className={`flex items-center gap-2 ${theme.textMuted} hover:text-orange-400 transition-colors`}
           >
             <ArrowLeft size={20} />
             <span>Back to Profile</span>
@@ -187,7 +187,7 @@ export default function UpdateProfile() {
 
           <button
             onClick={() => navigate("/dashboard")}
-            className={`${theme.textMuted} hover:text-white transition-colors`}
+            className={`${theme.textMuted} hover:text-orange-400 transition-colors`}
           >
             <X size={24} />
           </button>

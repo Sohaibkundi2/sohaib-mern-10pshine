@@ -75,10 +75,9 @@ export default function About() {
       <div className="fixed top-20 left-6 z-50">
         <button
           onClick={() => navigate("/dashboard")}
-          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-800/80 backdrop-blur-sm border border-white/10 hover:bg-slate-700/80 transition text-gray-300 hover:text-white"
+          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-800/80 backdrop-blur-sm border border-white/10 hover:bg-slate-700/80 transition text-gray-300 hover:text-orange-400"
         >
           <ArrowLeft size={18} />
-          <span>Back</span>
         </button>
       </div>
 

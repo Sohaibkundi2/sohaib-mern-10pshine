@@ -1,33 +1,63 @@
 // src/components/ProfileMenu.jsx
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { User, LogOut, Settings, Bell, Star } from "lucide-react";
+import { User, LogOut, Settings, Info, Home } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { notesAPI } from "../services/api";
 import { theme } from "../utils/theme";
 import LogoutModal from "./LogoutModal";
 import dayjs from "dayjs";
 
-export default function ProfileMenu({ stats }) {
+export default function ProfileMenu() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [stats, setStats] = useState({ total: 0, favorites: 0 });
 
   // Get user data with fallbacks
   const userData = {
     name: user?.fullName || "User",
     email: user?.email || "user@example.com",
     avatar: user?.avatar || null,
-    joinedDate: user?.createdAt 
+    joinedDate: user?.createdAt
       ? dayjs(user.createdAt).format("MMM YYYY")
       : "Recently"
+  };
+
+  // Fetch stats when menu opens
+  useEffect(() => {
+    if (showProfileMenu) {
+      fetchStats();
+    }
+  }, [showProfileMenu]);
+
+  const fetchStats = async () => {
+    try {
+      const response = await notesAPI.getAll();
+      const notes = response.data.data || [];
+
+      const totalNotes = notes.filter(n => !n.isArchived).length;
+      const favoriteNotes = notes.filter(n => n.isFavorite && !n.isArchived).length;
+
+      setStats({ total: totalNotes, favorites: favoriteNotes });
+    } catch (err) {
+      console.error("Failed to fetch stats:", err);
+      // Keep default 0, 0 if fetch fails
+    }
   };
 
   const handleLogout = () => {
     setShowProfileMenu(false);
     setShowLogoutModal(true);
   };
+
+  const handleDashboardClick = () => {
+    setShowProfileMenu(false);
+    navigate("/dashboard");
+  };
+
 
   const handleProfileClick = () => {
     setShowProfileMenu(false);
@@ -39,18 +69,23 @@ export default function ProfileMenu({ stats }) {
     navigate("/update-profile");
   };
 
+  const handleAboutClick = () => {
+    setShowProfileMenu(false);
+    navigate("/about");
+  };
+
   return (
     <div className="relative">
       {/* Profile Avatar Button */}
-      <button 
+      <button
         onClick={() => setShowProfileMenu(!showProfileMenu)}
         className="w-9 h-9 md:w-10 md:h-10 rounded-full bg-gradient-to-r from-pink-500 to-rose-500 flex items-center justify-center text-sm font-semibold border-2 border-white/20 hover:border-white/40 transition"
       >
         {userData.avatar ? (
-          <img 
-            src={userData.avatar} 
-            alt={userData.name} 
-            className="w-full h-full rounded-full object-cover" 
+          <img
+            src={userData.avatar}
+            alt={userData.name}
+            className="w-full h-full rounded-full object-cover"
           />
         ) : (
           userData.name.charAt(0).toUpperCase()
@@ -78,8 +113,8 @@ export default function ProfileMenu({ stats }) {
                 <div className="flex items-center gap-3">
                   <div className="w-12 h-12 rounded-full bg-gradient-to-r from-pink-500 to-rose-500 flex items-center justify-center text-lg font-bold border-2 border-white/30 overflow-hidden">
                     {userData.avatar ? (
-                      <img 
-                        src={userData.avatar} 
+                      <img
+                        src={userData.avatar}
                         alt={userData.name}
                         className="w-full h-full object-cover"
                       />
@@ -92,16 +127,16 @@ export default function ProfileMenu({ stats }) {
                     <p className={`text-xs ${theme.textMuted}`}>{userData.email}</p>
                   </div>
                 </div>
-                
+
                 {/* Stats */}
                 <div className="grid grid-cols-3 gap-3 mt-3 text-xs">
                   <div>
                     <span className={theme.textMuted}>Notes</span>
-                    <p className="font-semibold text-orange-400">{stats?.total || 0}</p>
+                    <p className="font-semibold text-orange-400">{stats.total}</p>
                   </div>
                   <div>
                     <span className={theme.textMuted}>Favorites</span>
-                    <p className="font-semibold text-pink-400">{stats?.favorites || 0}</p>
+                    <p className="font-semibold text-pink-400">{stats.favorites}</p>
                   </div>
                   <div>
                     <span className={theme.textMuted}>Joined</span>
@@ -112,38 +147,42 @@ export default function ProfileMenu({ stats }) {
 
               {/* Menu Items */}
               <div className="p-2">
-                <button 
+                <button
+                  onClick={handleDashboardClick}
+                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/10 transition text-sm ${theme.text} border-l-2 border-transparent hover:border-orange-400`}
+                >
+                  <Home size={16} className="text-orange-400" />
+                  <span>Home</span>
+                </button>
+                <button
                   onClick={handleProfileClick}
-                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/10 transition text-sm ${theme.text}`}
+                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/10 transition text-sm ${theme.text} border-l-2 border-transparent hover:border-orange-400`}
                 >
                   <User size={16} className="text-orange-400" />
                   <span>My Profile</span>
                 </button>
-                
-                <button 
+
+                <button
                   onClick={handleSettingsClick}
-                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/10 transition text-sm ${theme.text}`}
+                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/10 transition text-sm ${theme.text} border-l-2 border-transparent hover:border-orange-400`}
                 >
                   <Settings size={16} className="text-orange-400" />
                   <span>Settings</span>
                 </button>
-                
-                <button 
-                  onClick={() => {
-                    setShowProfileMenu(false);
-                    // Add notification functionality later
-                  }}
-                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/10 transition text-sm ${theme.text}`}
+
+                <button
+                  onClick={handleAboutClick}
+                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/10 transition text-sm ${theme.text} border-l-2 border-transparent hover:border-orange-400`}
                 >
-                  <Bell size={16} className="text-orange-400" />
-                  <span>Notifications</span>
+                  <Info size={16} className="text-orange-400" />
+                  <span>About</span>
                 </button>
-                
+
                 <div className={`border-t ${theme.border} my-2`}></div>
-                
-                <button 
+
+                <button
                   onClick={handleLogout}
-                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-red-500/20 transition text-sm text-red-400`}
+                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-red-500/20 transition text-sm text-red-400 border-l-2 border-transparent hover:border-red-400`}
                 >
                   <LogOut size={16} />
                   <span>Logout</span>
@@ -155,7 +194,7 @@ export default function ProfileMenu({ stats }) {
       </AnimatePresence>
 
       {/* Logout Modal */}
-      <LogoutModal 
+      <LogoutModal
         isOpen={showLogoutModal}
         onClose={() => setShowLogoutModal(false)}
       />
