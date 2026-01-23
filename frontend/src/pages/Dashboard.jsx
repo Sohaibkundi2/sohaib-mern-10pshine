@@ -301,7 +301,7 @@ export default function Dashboard() {
       {/* Main Content */}
       <main className="py-24 md:ml-64 p-4 md:p-6">
         {/* Filter Header */}
-        <div className="mb-6">
+        <div className="md:mt-16 mb-6">
           <h2 className={`text-2xl font-bold ${theme.text} mb-1`}>
             {activeFilter === "all" && "All Notes"}
             {activeFilter === "favorites" && "Favorite Notes"}

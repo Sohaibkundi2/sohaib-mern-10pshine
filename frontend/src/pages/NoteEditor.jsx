@@ -120,10 +120,10 @@ export default function NoteEditor() {
       <div className="pt-20 p-4 md:p-8">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
-        <div className="flex justify-between items-center mb-6">
+        <div className="md:mt-14 flex justify-between items-center mb-6 md:mb-0">
           <button
             onClick={() => navigate("/dashboard")}
-            className={`flex items-center gap-2 ${theme.textMuted} hover:text-white transition-colors`}
+            className={`flex items-center gap-2 ${theme.textMuted} hover:text-orange-400 transition-colors`}
           >
             <ArrowLeft size={20} />
             <span>Back to Dashboard</span>
@@ -131,7 +131,7 @@ export default function NoteEditor() {
 
           <button
             onClick={() => navigate("/dashboard")}
-            className={`${theme.textMuted} hover:text-white transition-colors`}
+            className={`${theme.textMuted} hover:text-orange-400 transition-colors`}
           >
             <X size={24} />
           </button>
