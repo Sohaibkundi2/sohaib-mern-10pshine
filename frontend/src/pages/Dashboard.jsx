@@ -1,11 +1,10 @@
 // src/pages/Dashboard.jsx
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Edit, Trash2, Plus, Star, Archive, FolderOpen, Search } from "lucide-react";
+import { Menu, X, Edit, Trash2, Plus, Star, Archive, FolderOpen, Search, Feather } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { notesAPI } from "../services/api";
-import Navbar from "../components/Navbar";
 import DeleteNoteModal from "../components/DeleteNoteModal";
 import { theme } from "../utils/theme";
 import ProfileMenu from "../components/ProfileMenu";
@@ -41,7 +40,7 @@ export default function Dashboard() {
     } catch (err) {
       console.error("Failed to fetch notes:", err);
       setError(err.response?.data?.message || "Failed to load notes");
-      
+
       if (err.response?.status === 401) {
         navigate("/login");
       }
@@ -59,9 +58,9 @@ export default function Dashboard() {
     try {
       await notesAPI.toggleFavorite(noteId);
       // Update the note in state immediately for better UX
-      setNotes(prevNotes => 
-        prevNotes.map(note => 
-          note._id === noteId 
+      setNotes(prevNotes =>
+        prevNotes.map(note =>
+          note._id === noteId
             ? { ...note, isFavorite: !note.isFavorite }
             : note
         )
@@ -92,15 +91,15 @@ export default function Dashboard() {
       {/* Navbar */}
       <nav className={`w-full backdrop-blur-lg ${theme.navbar} border-b border-white/10 px-4 md:px-6 py-4 flex justify-between items-center fixed top-0 left-0 z-50`}>
         <div className="flex items-center gap-3">
-          <button 
+          <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             className="md:hidden p-2 rounded-lg bg-white/10 hover:bg-white/20 transition"
           >
             {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
-          
+
           <div className="text-lg md:text-xl font-bold bg-gradient-to-r from-orange-400 to-pink-500 bg-clip-text text-transparent">
-            Glass Notes
+            Ilmora Writes
           </div>
         </div>
 
@@ -148,7 +147,7 @@ export default function Dashboard() {
                     <p className={`text-xs ${theme.textMuted}`}>{userData.email}</p>
                   </div>
                 </div>
-                
+
                 {/* Stats */}
                 <div className="grid grid-cols-3 gap-2 text-xs border-t border-white/10 pt-3">
                   <div className="text-center">
@@ -166,7 +165,7 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              <button 
+              <button
                 onClick={handleCreateNote}
                 className={`w-full py-3 rounded-xl ${theme.button} hover:opacity-90 border border-white/20 text-sm font-semibold transition shadow-lg mb-4`}
               >
@@ -175,31 +174,28 @@ export default function Dashboard() {
 
               {/* Navigation */}
               <div className="space-y-2">
-                <button 
+                <button
                   onClick={() => { setActiveFilter("all"); setIsMobileMenuOpen(false); }}
-                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition text-sm font-medium ${
-                    activeFilter === "all" ? "bg-orange-500/20 border border-orange-500/50 text-orange-400" : "hover:bg-white/10 border border-transparent"
-                  }`}
+                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition text-sm font-medium ${activeFilter === "all" ? "bg-orange-500/20 border border-orange-500/50 text-orange-400" : "hover:bg-white/10 border border-transparent"
+                    }`}
                 >
                   <FolderOpen size={18} />
                   All Notes ({stats.total})
                 </button>
-                
-                <button 
+
+                <button
                   onClick={() => { setActiveFilter("favorites"); setIsMobileMenuOpen(false); }}
-                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition text-sm font-medium ${
-                    activeFilter === "favorites" ? "bg-pink-500/20 border border-pink-500/50 text-pink-400" : "hover:bg-white/10 border border-transparent"
-                  }`}
+                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition text-sm font-medium ${activeFilter === "favorites" ? "bg-pink-500/20 border border-pink-500/50 text-pink-400" : "hover:bg-white/10 border border-transparent"
+                    }`}
                 >
                   <Star size={18} />
                   Favorites ({stats.favorites})
                 </button>
-                
-                <button 
+
+                <button
                   onClick={() => { setActiveFilter("archived"); setIsMobileMenuOpen(false); }}
-                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition text-sm font-medium ${
-                    activeFilter === "archived" ? "bg-gray-500/20 border border-gray-500/50 text-gray-300" : "hover:bg-white/10 border border-transparent"
-                  }`}
+                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition text-sm font-medium ${activeFilter === "archived" ? "bg-gray-500/20 border border-gray-500/50 text-gray-300" : "hover:bg-white/10 border border-transparent"
+                    }`}
                 >
                   <Archive size={18} />
                   Archived ({stats.archived})
@@ -209,7 +205,7 @@ export default function Dashboard() {
               <div className="border-t border-white/10 my-4"></div>
 
               <div className="space-y-2">
-                <button 
+                <button
                   onClick={() => navigate("/about")}
                   className={`w-full text-left px-4 py-3 rounded-xl hover:bg-white/10 transition text-sm ${theme.text}`}
                 >
@@ -228,11 +224,13 @@ export default function Dashboard() {
         className={`hidden md:block fixed top-0 left-0 w-64 h-screen backdrop-blur-xl bg-gradient-to-b ${theme.sidebar} border-r border-white/10 pt-20 px-5 shadow-2xl overflow-y-auto`}
       >
         <div className="flex items-center gap-2 mb-6">
-          <div className="w-7 h-7 bg-gradient-to-r from-orange-400 to-pink-500 rounded-lg shadow-lg"></div>
-          <span className={`font-bold text-lg ${theme.text}`}>Glass Notes</span>
+          <div className={`w-10 h-10 bg-gradient-to-r ${theme.gradient} rounded-xl shadow-lg flex items-center justify-center`}>
+            <Feather className="text-white" size={24} />
+          </div>
+          <span className={`font-bold text-lg ${theme.text}`}>Ilmora Writes</span>
         </div>
 
-        <button 
+        <button
           onClick={handleCreateNote}
           className={`w-full py-3 rounded-xl ${theme.button} hover:opacity-90 border border-white/20 text-sm font-semibold transition shadow-lg mb-6`}
         >
@@ -257,31 +255,28 @@ export default function Dashboard() {
 
         {/* Navigation */}
         <div className="space-y-2">
-          <button 
+          <button
             onClick={() => setActiveFilter("all")}
-            className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition text-sm font-medium ${
-              activeFilter === "all" ? "bg-orange-500/20 text-orange-400 border border-orange-500/30" : `${theme.textMuted} hover:bg-white/10`
-            }`}
+            className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition text-sm font-medium ${activeFilter === "all" ? "bg-orange-500/20 text-orange-400 border border-orange-500/30" : `${theme.textMuted} hover:bg-white/10`
+              }`}
           >
             <FolderOpen size={18} />
             All Notes
           </button>
-          
-          <button 
+
+          <button
             onClick={() => setActiveFilter("favorites")}
-            className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition text-sm font-medium ${
-              activeFilter === "favorites" ? "bg-pink-500/20 text-pink-400 border border-pink-500/30" : `${theme.textMuted} hover:bg-white/10`
-            }`}
+            className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition text-sm font-medium ${activeFilter === "favorites" ? "bg-pink-500/20 text-pink-400 border border-pink-500/30" : `${theme.textMuted} hover:bg-white/10`
+              }`}
           >
             <Star size={18} />
             Favorites
           </button>
-          
-          <button 
+
+          <button
             onClick={() => setActiveFilter("archived")}
-            className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition text-sm font-medium ${
-              activeFilter === "archived" ? "bg-gray-500/20 text-gray-300 border border-gray-500/30" : `${theme.textMuted} hover:bg-white/10`
-            }`}
+            className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition text-sm font-medium ${activeFilter === "archived" ? "bg-gray-500/20 text-gray-300 border border-gray-500/30" : `${theme.textMuted} hover:bg-white/10`
+              }`}
           >
             <Archive size={18} />
             Archived
@@ -290,7 +285,7 @@ export default function Dashboard() {
 
         <div className="border-t border-white/10 my-4"></div>
 
-        <button 
+        <button
           onClick={() => navigate("/about")}
           className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-white/10 transition text-sm ${theme.textMuted}`}
         >
@@ -367,20 +362,19 @@ export default function Dashboard() {
               >
                 {/* Favorite Badge - Top Right */}
                 <div className="absolute top-4 right-4">
-                  <button 
-                    onClick={(e) => { 
-                      e.stopPropagation(); 
-                      handleToggleFavorite(note._id); 
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleToggleFavorite(note._id);
                     }}
-                    className={`transition-all p-1.5 rounded-lg cursor-pointer ${
-                      note.isFavorite 
-                        ? 'text-pink-500 hover:text-pink-600 hover:bg-pink-500/10' 
+                    className={`transition-all p-1.5 rounded-lg cursor-pointer ${note.isFavorite
+                        ? 'text-pink-500 hover:text-pink-600 hover:bg-pink-500/10'
                         : 'text-gray-400 hover:text-pink-400 hover:bg-pink-500/10'
-                    }`}
+                      }`}
                     title={note.isFavorite ? "Remove from favorites" : "Add to favorites"}
                   >
-                    <Star 
-                      size={20} 
+                    <Star
+                      size={20}
                       fill={note.isFavorite ? "currentColor" : "none"}
                       strokeWidth={2}
                     />
@@ -388,14 +382,14 @@ export default function Dashboard() {
                 </div>
 
                 {/* Content Area - Clickable */}
-                <div 
+                <div
                   onClick={() => handleEditNote(note._id)}
                   className="cursor-pointer pr-8"
                 >
                   <h3 className={`font-semibold text-lg bg-gradient-to-r from-orange-400 to-pink-400 bg-clip-text text-transparent line-clamp-2 mb-2`}>
                     {note.title}
                   </h3>
-                  
+
                   <p className={`text-sm line-clamp-4 ${theme.textMuted} mb-4`}>
                     {note.content}
                   </p>
@@ -404,15 +398,15 @@ export default function Dashboard() {
                 {/* Footer */}
                 <div className="flex items-center justify-between pt-3 border-t border-white/10">
                   <span className={`text-xs ${theme.textMuted} flex items-center gap-1`}>
-                    {dayjs(note.createdAt).format("MMM DD, YYYY")}
+                    {dayjs(note.createdAt).format("hh:mm A, DD MMM")}
                   </span>
 
                   <div className="flex items-center gap-2">
                     {/* Edit Button */}
-                    <button 
-                      onClick={(e) => { 
-                        e.stopPropagation(); 
-                        handleEditNote(note._id); 
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleEditNote(note._id);
                       }}
                       className="p-2 rounded-lg hover:bg-orange-500/10 hover:text-orange-400 transition-all cursor-pointer"
                       title="Edit note"
@@ -421,10 +415,10 @@ export default function Dashboard() {
                     </button>
 
                     {/* Delete Button */}
-                    <button 
-                      onClick={(e) => { 
-                        e.stopPropagation(); 
-                        handleDeleteClick(note); 
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteClick(note);
                       }}
                       className="p-2 rounded-lg hover:bg-red-500/10 hover:text-red-400 transition-all cursor-pointer"
                       title="Delete note"
