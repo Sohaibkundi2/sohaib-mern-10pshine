@@ -23,6 +23,11 @@ const noteSchema = new Schema(
       default: false,
       index: true,
     },
+    isArchived: {
+      type: Boolean,
+      default: false,
+      index: true,
+    },
   },
   { timestamps: true },
 );

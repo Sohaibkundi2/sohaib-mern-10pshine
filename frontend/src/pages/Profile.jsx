@@ -17,12 +17,16 @@ dayjs.extend(relativeTime);
 export default function Profile() {
   const navigate = useNavigate();
   const { user: contextUser } = useAuth();
-  
+
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [showLogoutModal, setShowLogoutModal] = useState(false);
-  const [notesStats, setNotesStats] = useState({ total: 0, favorites: 0 });
+  const [notesStats, setNotesStats] = useState({
+    total: 0,
+    favorites: 0,
+    archived: 0,
+  });
 
   useEffect(() => {
     fetchProfileData();
@@ -31,21 +35,27 @@ export default function Profile() {
   const fetchProfileData = async () => {
     try {
       setLoading(true);
-      
+
       // Fetch profile and notes in parallel
       const [profileRes, notesRes] = await Promise.all([
         profileAPI.getProfile(),
         notesAPI.getAll()
       ]);
-      
+
       setProfile(profileRes.data.data);
-      
+
       // Calculate stats from notes
       const notes = notesRes.data.data || [];
+
       const totalNotes = notes.filter(n => !n.isArchived).length;
       const favoriteNotes = notes.filter(n => n.isFavorite && !n.isArchived).length;
-      
-      setNotesStats({ total: totalNotes, favorites: favoriteNotes });
+      const archivedNotes = notes.filter(n => n.isArchived).length;
+
+      setNotesStats({
+        total: totalNotes,
+        favorites: favoriteNotes,
+        archived: archivedNotes,
+      });
     } catch (err) {
       console.error("Failed to fetch profile:", err);
       if (err.response?.status === 401) {
@@ -137,7 +147,7 @@ export default function Profile() {
                     {userData?.username || "username"}
                   </p>
                 </div>
-                
+
                 <div className="flex gap-3 flex-shrink-0">
                   <motion.button
                     whileHover={{ scale: 1.05 }}
@@ -149,7 +159,7 @@ export default function Profile() {
                     <span className="hidden sm:inline">Edit Profile</span>
                     <span className="sm:hidden">Edit</span>
                   </motion.button>
-                  
+
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
@@ -188,6 +198,19 @@ export default function Profile() {
 
                 <motion.div
                   whileHover={{ scale: 1.02 }}
+                  className={`p-4 md:p-5 rounded-2xl ${theme.card} border border-gray-500/30 bg-gradient-to-br from-gray-500/10 to-transparent`}
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <Clock size={20} className="text-gray-300" />
+                    <span className="text-2xl md:text-3xl font-bold text-gray-300">
+                      {notesStats.archived}
+                    </span>
+                  </div>
+                  <p className={`text-xs md:text-sm ${theme.textMuted}`}>Archived Notes</p>
+                </motion.div>
+
+                <motion.div
+                  whileHover={{ scale: 1.02 }}
                   className={`p-4 md:p-5 rounded-2xl ${theme.card} border border-rose-500/30 bg-gradient-to-br from-rose-500/10 to-transparent`}
                 >
                   <div className="flex items-center justify-between mb-2">
@@ -200,19 +223,6 @@ export default function Profile() {
                   </div>
                   <p className={`text-xs md:text-sm ${theme.textMuted}`}>Joined Year</p>
                 </motion.div>
-
-                <motion.div
-                  whileHover={{ scale: 1.02 }}
-                  className={`p-4 md:p-5 rounded-2xl ${theme.card} border border-purple-500/30 bg-gradient-to-br from-purple-500/10 to-transparent`}
-                >
-                  <div className="flex items-center justify-between mb-2">
-                    <Shield size={20} className="text-purple-400" />
-                    <span className="text-base md:text-xl font-bold text-purple-400 capitalize">
-                      {userData?.role || "User"}
-                    </span>
-                  </div>
-                  <p className={`text-xs md:text-sm ${theme.textMuted}`}>Account Type</p>
-                </motion.div>
               </div>
 
               {/* Account Details */}
@@ -221,7 +231,7 @@ export default function Profile() {
                   <Mail size={20} className="text-orange-400" />
                   Account Information
                 </h3>
-                
+
                 <div className="space-y-3 md:space-y-4">
                   <div className={`flex items-center justify-between p-3 md:p-4 rounded-xl ${theme.card} border`}>
                     <div className="flex items-center gap-3">
@@ -316,7 +326,7 @@ export default function Profile() {
       </div>
 
       {/* Logout Modal */}
-      <LogoutModal 
+      <LogoutModal
         isOpen={showLogoutModal}
         onClose={() => setShowLogoutModal(false)}
       />

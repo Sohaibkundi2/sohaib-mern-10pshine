@@ -71,8 +71,25 @@ export default function Dashboard() {
     }
   };
 
+  const handleToggleArchive = async (noteId) => {
+    try {
+      await notesAPI.toggleArchive(noteId);
+
+      setNotes(prevNotes =>
+        prevNotes.map(note =>
+          note._id === noteId
+            ? { ...note, isArchived: !note.isArchived }
+            : note
+        )
+      );
+    } catch (err) {
+      console.error("Failed to toggle archive:", err);
+    }
+  };
+
+  // FIXED: Archived notes don't show in favorites filter
   const filteredNotes = notes.filter(note => {
-    if (activeFilter === "favorites") return note.isFavorite;
+    if (activeFilter === "favorites") return note.isFavorite && !note.isArchived;
     if (activeFilter === "archived") return note.isArchived;
     return !note.isArchived; // 'all' shows non-archived
   });
@@ -98,9 +115,18 @@ export default function Dashboard() {
             {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
 
-          <div className="text-lg md:text-xl font-bold bg-gradient-to-r from-orange-400 to-pink-500 bg-clip-text text-transparent">
-            Ilmora Writes
+          <div className="flex items-center gap-3">
+            <div
+              className={`w-10 h-9 bg-gradient-to-r ${theme.gradient} rounded-xl shadow-lg flex items-center justify-center`}
+            >
+              <Feather className="text-white" size={24} />
+            </div>
+
+            <span className="text-lg md:text-xl font-bold bg-gradient-to-r from-orange-400 to-pink-500 bg-clip-text text-transparent leading-none">
+              Ilmora Writes
+            </span>
           </div>
+
         </div>
 
         <div className="hidden md:flex gap-6 text-sm font-medium items-center">
@@ -360,31 +386,51 @@ export default function Dashboard() {
                 transition={{ delay: index * 0.03 }}
                 className={`relative p-5 rounded-2xl backdrop-blur-sm ${theme.card} border ${theme.cardHover} shadow-lg transition-all group`}
               >
-                {/* Favorite Badge - Top Right */}
-                <div className="absolute top-4 right-4">
+                {/* Toggle Buttons - Top Right (Simple) */}
+                <div className="absolute top-4 right-4 flex items-center gap-1 z-10">
+                  {/* Favorite Button */}
                   <button
+                    type="button"
                     onClick={(e) => {
+                      e.preventDefault();
                       e.stopPropagation();
                       handleToggleFavorite(note._id);
                     }}
-                    className={`transition-all p-1.5 rounded-lg cursor-pointer ${note.isFavorite
-                        ? 'text-pink-500 hover:text-pink-600 hover:bg-pink-500/10'
-                        : 'text-gray-400 hover:text-pink-400 hover:bg-pink-500/10'
+                    className={`p-2 rounded-lg transition-all cursor-pointer ${note.isFavorite
+                      ? 'text-pink-400 hover:text-pink-500 hover:bg-pink-500/10'
+                      : 'text-gray-400 hover:text-pink-400 hover:bg-pink-500/10'
                       }`}
                     title={note.isFavorite ? "Remove from favorites" : "Add to favorites"}
                   >
                     <Star
-                      size={20}
+                      size={16}
                       fill={note.isFavorite ? "currentColor" : "none"}
                       strokeWidth={2}
                     />
                   </button>
+
+                  {/* Archive Button */}
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleToggleArchive(note._id);
+                    }}
+                    className={`p-2 rounded-lg transition-all cursor-pointer ${note.isArchived
+                      ? " hover:bg-red-500/10 hover:text-red-400  "
+                      : "hover:bg-red-500/10 hover:text-red-400 "
+                      }`}
+                    title={note.isArchived ? "Restore note" : "Archive note"}
+                  >
+                    <Archive size={16} />
+                  </button>
                 </div>
 
-                {/* Content Area - Clickable */}
+                {/* Content Area - Clickable (but not if archived) */}
                 <div
-                  onClick={() => handleEditNote(note._id)}
-                  className="cursor-pointer pr-8"
+                  onClick={() => !note.isArchived && handleEditNote(note._id)}
+                  className={`pr-8 ${note.isArchived ? "cursor-default opacity-60" : "cursor-pointer"}`}
                 >
                   <h3 className={`font-semibold text-lg bg-gradient-to-r from-orange-400 to-pink-400 bg-clip-text text-transparent line-clamp-2 mb-2`}>
                     {note.title}
@@ -402,29 +448,40 @@ export default function Dashboard() {
                   </span>
 
                   <div className="flex items-center gap-2">
-                    {/* Edit Button */}
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleEditNote(note._id);
-                      }}
-                      className="p-2 rounded-lg hover:bg-orange-500/10 hover:text-orange-400 transition-all cursor-pointer"
-                      title="Edit note"
-                    >
-                      <Edit size={16} />
-                    </button>
+                    {/* Edit Button - Hidden for archived notes */}
+                    {!note.isArchived && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleEditNote(note._id);
+                        }}
+                        className="p-2 rounded-lg hover:bg-orange-500/10 hover:text-orange-400 transition-all cursor-pointer"
+                        title="Edit note"
+                      >
+                        <Edit size={16} />
+                      </button>
+                    )}
 
-                    {/* Delete Button */}
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDeleteClick(note);
-                      }}
-                      className="p-2 rounded-lg hover:bg-red-500/10 hover:text-red-400 transition-all cursor-pointer"
-                      title="Delete note"
-                    >
-                      <Trash2 size={16} />
-                    </button>
+                    {/* Delete Button - Hidden for archived notes */}
+                    {!note.isArchived && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteClick(note);
+                        }}
+                        className="p-2 rounded-lg hover:bg-red-500/10 hover:text-red-400 transition-all cursor-pointer"
+                        title="Delete note"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    )}
+
+                    {/* Show "Archived" badge instead when archived */}
+                    {note.isArchived && (
+                      <span className="text-xs hover:bg-orange-500/10 hover:text-orange-400  rounded-lg">
+                        Archived
+                      </span>
+                    )}
                   </div>
                 </div>
               </motion.div>

@@ -141,6 +141,9 @@ export const notesAPI = {
 
   // Toggle favorite status
   toggleFavorite: (id) => api.patch(`/notes/${id}/favorite`),
+
+  // Toggle archive status  
+  toggleArchive: (id) => api.patch(`/notes/${id}/archive`),
 };
 
 export default api;
