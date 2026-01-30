@@ -1,7 +1,7 @@
 // src/pages/Profile.jsx
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { ArrowLeft, Edit, LogOut, Mail, Calendar, FileText, Star, Shield, Clock } from "lucide-react";
+import { ArrowLeft, Edit, LogOut, Mail, Calendar, FileText, Star, Shield, Clock, Settings } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { profileAPI, notesAPI } from "../services/api";
@@ -173,10 +173,10 @@ export default function Profile() {
               </div>
 
               {/* Stats Grid */}
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-8">
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-8 ">
                 <motion.div
                   whileHover={{ scale: 1.02 }}
-                  className={`p-4 md:p-5 rounded-2xl ${theme.card} border border-orange-500/30 bg-gradient-to-br from-orange-500/10 to-transparent`}
+                  className={`p-4 md:p-5 rounded-2xl ${theme.card} border border-orange-500/30 bg-gradient-to-br from-orange-500/10 to-transparent border-r-2 border-r-rose-400`}
                 >
                   <div className="flex items-center justify-between mb-2">
                     <FileText size={20} className="text-orange-400" />
@@ -187,7 +187,7 @@ export default function Profile() {
 
                 <motion.div
                   whileHover={{ scale: 1.02 }}
-                  className={`p-4 md:p-5 rounded-2xl ${theme.card} border border-pink-500/30 bg-gradient-to-br from-pink-500/10 to-transparent`}
+                  className={`p-4 md:p-5 rounded-2xl ${theme.card} border border-pink-500/30 bg-gradient-to-br from-pink-500/10 to-transparent border-r-2 border-r-rose-400`}
                 >
                   <div className="flex items-center justify-between mb-2">
                     <Star size={20} className="text-pink-400" />
@@ -198,7 +198,7 @@ export default function Profile() {
 
                 <motion.div
                   whileHover={{ scale: 1.02 }}
-                  className={`p-4 md:p-5 rounded-2xl ${theme.card} border border-gray-500/30 bg-gradient-to-br from-gray-500/10 to-transparent`}
+                  className={`p-4 md:p-5 rounded-2xl ${theme.card} border border-gray-500/30 bg-gradient-to-br from-gray-500/10 to-transparent border-r-2 border-r-rose-400`}
                 >
                   <div className="flex items-center justify-between mb-2">
                     <Clock size={20} className="text-gray-300" />
@@ -211,7 +211,7 @@ export default function Profile() {
 
                 <motion.div
                   whileHover={{ scale: 1.02 }}
-                  className={`p-4 md:p-5 rounded-2xl ${theme.card} border border-rose-500/30 bg-gradient-to-br from-rose-500/10 to-transparent`}
+                  className={`p-4 md:p-5 rounded-2xl ${theme.card} border border-rose-500/30 bg-gradient-to-br from-rose-500/10 to-transparent border-r-2 border-r-rose-400`}
                 >
                   <div className="flex items-center justify-between mb-2">
                     <Calendar size={20} className="text-rose-400" />
@@ -233,7 +233,7 @@ export default function Profile() {
                 </h3>
 
                 <div className="space-y-3 md:space-y-4">
-                  <div className={`flex items-center justify-between p-3 md:p-4 rounded-xl ${theme.card} border`}>
+                  <div className={`flex items-center justify-between p-3 md:p-4 rounded-xl ${theme.card} border-l-2 border-l-rose-400`}>
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-lg bg-orange-500/20 flex items-center justify-center flex-shrink-0">
                         <Mail size={18} className="text-orange-400" />
@@ -245,7 +245,7 @@ export default function Profile() {
                     </div>
                   </div>
 
-                  <div className={`flex items-center justify-between p-3 md:p-4 rounded-xl ${theme.card} border`}>
+                  <div className={`flex items-center justify-between p-3 md:p-4 rounded-xl ${theme.card} border-l-2 border-l-rose-400`}>
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-lg bg-pink-500/20 flex items-center justify-center flex-shrink-0">
                         <Calendar size={18} className="text-pink-400" />
@@ -261,7 +261,7 @@ export default function Profile() {
                     </div>
                   </div>
 
-                  <div className={`flex items-center justify-between p-3 md:p-4 rounded-xl ${theme.card} border`}>
+                  <div className={`flex items-center justify-between p-3 md:p-4 rounded-xl ${theme.card} border-l-2 border-l-rose-400`}>
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-lg bg-purple-500/20 flex items-center justify-center flex-shrink-0">
                         <Clock size={18} className="text-purple-400" />
@@ -282,46 +282,32 @@ export default function Profile() {
           </motion.div>
 
           {/* Quick Actions */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="grid grid-cols-1 md:grid-cols-2 gap-4"
-          >
-            <button
-              onClick={() => navigate("/dashboard")}
-              className={`p-5 rounded-2xl ${theme.card} border ${theme.cardHover} transition-all text-left group`}
-            >
-              <div className="flex items-center justify-between">
-                <div>
-                  <h4 className={`font-semibold ${theme.text} mb-1 group-hover:text-orange-400 transition-colors`}>
-                    View All Notes
-                  </h4>
-                  <p className={`text-sm ${theme.textMuted}`}>
-                    Browse your {notesStats.total} notes
-                  </p>
-                </div>
-                <FileText size={24} className="text-orange-400 group-hover:scale-110 transition-transform" />
-              </div>
-            </button>
+<motion.div
+  whileHover={{ y: -2 }}
+className={`relative p-5 rounded-2xl ${theme.card} border-l-2 border-l-rose-400 overflow-hidden flex gap-4`}
+>
 
-            <button
-              onClick={() => navigate("/update-profile")}
-              className={`p-5 rounded-2xl ${theme.card} border ${theme.cardHover} transition-all text-left group`}
-            >
-              <div className="flex items-center justify-between">
-                <div>
-                  <h4 className={`font-semibold ${theme.text} mb-1 group-hover:text-pink-400 transition-colors`}>
-                    Update Profile
-                  </h4>
-                  <p className={`text-sm ${theme.textMuted}`}>
-                    Change your account settings
-                  </p>
-                </div>
-                <Edit size={24} className="text-pink-400 group-hover:scale-110 transition-transform" />
-              </div>
-            </button>
-          </motion.div>
+  <div className="flex items-center justify-between w-full">
+    <div>
+      <h4 className={`font-semibold ${theme.text} mb-1 flex items-center gap-2`}>
+        Preferences
+        <span className="text-[10px] px-2 py-0.5 rounded-full bg-yellow-400/20 text-yellow-300 border border-yellow-400/30">
+          Soon
+        </span>
+      </h4>
+
+      <p className={`text-sm ${theme.textMuted}`}>
+        Personalization options coming soon
+      </p>
+    </div>
+
+    <div className="w-12 h-12 rounded-xl bg-yellow-400/15 flex items-center justify-center">
+      <Settings size={22} className="text-yellow-300" />
+    </div>
+  </div>
+</motion.div>
+
+
         </div>
       </div>
 
