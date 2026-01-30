@@ -20,18 +20,30 @@ const createNote = asyncHandler(async (req, res) => {
 });
 
 const getAllNotes = asyncHandler(async (req, res) => {
-  const { favorite } = req.query; // optional query param
-  
+  const { favorite, archived } = req.query;
+
   const filter = { owner: req.user._id };
-  if (favorite === 'true') {
+
+  if (favorite === "true") {
     filter.isFavorite = true;
   }
-  
+
+  if (archived === "true") {
+    filter.isArchived = true;
+  } else if (archived === "false") {
+    filter.isArchived = false;
+  }
+
   const notes = await Note.find(filter).sort({ createdAt: -1 });
 
-  logger.info({ count: notes.length, userId: req.user._id }, "Fetched all notes");
+  logger.info(
+    { count: notes.length, userId: req.user._id },
+    "Fetched notes"
+  );
 
-  res.status(200).json(new ApiResponse(200, notes, "Notes fetched successfully"));
+  res
+    .status(200)
+    .json(new ApiResponse(200, notes, "Notes fetched successfully"));
 });
 
 const getNoteById = asyncHandler(async (req, res) => {
@@ -92,5 +104,37 @@ const toggleFavorite = asyncHandler(async (req, res) => {
   );
 });
 
+const toggleArchive = asyncHandler(async (req, res) => {
+  const { id } = req.params;
 
-export { createNote, getAllNotes, getNoteById, updateNote, deleteNote, toggleFavorite  };
+  const note = await Note.findOne({
+    _id: id,
+    owner: req.user._id,
+  });
+
+  if (!note) {
+    throw new ApiError(404, "Note not found");
+  }
+
+  note.isArchived = !note.isArchived;
+  await note.save();
+
+  logger.info(
+    { noteId: id, isArchived: note.isArchived },
+    "Toggled note archive status"
+  );
+
+  res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        note,
+        note.isArchived ? "Note archived" : "Note restored"
+      )
+    );
+});
+
+
+
+export { createNote, getAllNotes, getNoteById, updateNote, deleteNote, toggleFavorite, toggleArchive };
