@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react"
 import { useNavigate, useParams, Link } from "react-router-dom"
 import { motion } from "framer-motion"
-import { Lock, Eye, EyeOff, CheckCircle, AlertCircle } from "lucide-react"
+import { Lock, Eye, EyeOff, CheckCircle, AlertCircle, Feather } from "lucide-react"
 import { authAPI } from "../services/api"
 import { theme } from "../utils/theme"
 
@@ -142,9 +142,11 @@ export default function ResetPassword() {
                 {/* Logo */}
                 <div className="flex justify-center mb-6">
                     <div className="flex items-center gap-2">
-                        <div className={`w-10 h-10 bg-gradient-to-r ${theme.gradient} rounded-xl shadow-lg`}></div>
+                        <div className={`w-10 h-10 bg-gradient-to-r ${theme.gradient} rounded-xl shadow-lg flex items-center justify-center`}>
+                        <Feather className="text-white" size={24} />
+                        </div>
                         <span className={`text-2xl font-bold ${theme.gradientText}`}>
-                            Glass Notes
+                            Ilmora Writes
                         </span>
                     </div>
                 </div>

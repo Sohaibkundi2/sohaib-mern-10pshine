@@ -1,6 +1,6 @@
 // src/pages/About.jsx
 import { motion } from "framer-motion";
-import { ArrowLeft, Github, Linkedin, Mail, BookOpen, Target, Lightbulb } from "lucide-react";
+import { ArrowLeft, Github, Linkedin, Mail, BookOpen, Target, Lightbulb, Feather } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { theme } from "../utils/theme";
 import Navbar from "../components/Navbar";
@@ -84,26 +84,26 @@ export default function About() {
       {/* Main Content */}
       <div className="pt-24 pb-16 px-4">
         {/* Hero Section */}
-        <section className="max-w-4xl mx-auto text-center mb-16">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-          >
-            <div className="w-20 h-20 bg-gradient-to-r from-orange-500 to-pink-500 rounded-2xl mx-auto mb-6 flex items-center justify-center shadow-2xl shadow-orange-500/30">
-              <span className="text-4xl font-bold">GN</span>
-            </div>
-            <h1 className={`text-5xl md:text-6xl font-bold ${theme.gradientText} mb-4`}>
-              Glass Notes
-            </h1>
-            <p className={`text-xl ${theme.textMuted} max-w-2xl mx-auto mb-6`}>
-              MERN Stack Note-Taking Application
-            </p>
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-800/50 border border-orange-500/30 text-sm">
-              <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-              <span className={theme.textMuted}>10P SHINE Project • January 2026</span>
-            </div>
-          </motion.div>
-        </section>
+<section className="max-w-4xl mx-auto text-center mb-16">
+  <motion.div
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+  >
+    <div className="w-20 h-20 bg-gradient-to-r from-orange-500 to-pink-500 rounded-2xl mx-auto mb-6 flex items-center justify-center shadow-2xl shadow-orange-500/30">
+      <Feather className="text-white" size={40} />
+    </div>
+    <h1 className={`text-5xl md:text-6xl font-bold ${theme.gradientText} mb-4`}>
+      Ilmora Writes
+    </h1>
+    <p className={`text-xl ${theme.textMuted} max-w-2xl mx-auto mb-6`}>
+      MERN Stack Note-Taking Application
+    </p>
+    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-800/50 border border-orange-500/30 text-sm">
+      <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+      <span className={theme.textMuted}>10P SHINE Project • January 2026</span>
+    </div>
+  </motion.div>
+</section>
 
         {/* Project Goals */}
         <section className="max-w-6xl mx-auto mb-16">
@@ -271,7 +271,7 @@ export default function About() {
         {/* Footer */}
         <footer className="mt-16 pt-8 border-t border-slate-800 text-center">
           <p className={`${theme.textMuted} text-sm`}>
-            © 2026 Glass Notes • Built with ❤️ MERN Stack • 10P SHINE Internship Project
+            © 2026 Ilmora Writes • Built with ❤️ MERN Stack • 10P SHINE Internship Project
           </p>
         </footer>
       </div>
