@@ -8,6 +8,13 @@ export default function DeleteNoteModal({ note, isOpen, onClose, onDeleteSuccess
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState("");
 
+  // Helper function to strip HTML tags
+  const stripHtml = (html) => {
+    const tmp = document.createElement("DIV");
+    tmp.innerHTML = html;
+    return tmp.textContent || tmp.innerText || "";
+  };
+
   const handleDelete = async () => {
     try {
       setDeleting(true);
@@ -73,7 +80,7 @@ export default function DeleteNoteModal({ note, isOpen, onClose, onDeleteSuccess
                   {note?.title || "Untitled Note"}
                 </h4>
                 <p className="text-sm text-gray-300 line-clamp-2">
-                  {note?.content || "No content"}
+                  {stripHtml(note?.content || "No content")}
                 </p>
               </div>
 
