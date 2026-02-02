@@ -57,7 +57,6 @@ export default function Dashboard() {
   const handleToggleFavorite = async (noteId) => {
     try {
       await notesAPI.toggleFavorite(noteId);
-      // Update the note in state immediately for better UX
       setNotes(prevNotes =>
         prevNotes.map(note =>
           note._id === noteId
@@ -67,7 +66,6 @@ export default function Dashboard() {
       );
     } catch (err) {
       console.error("Failed to toggle favorite:", err);
-      // Optionally show error toast/notification
     }
   };
 
@@ -85,6 +83,13 @@ export default function Dashboard() {
     } catch (err) {
       console.error("Failed to toggle archive:", err);
     }
+  };
+
+  // Helper function to strip HTML tags from content
+  const stripHtml = (html) => {
+    const tmp = document.createElement("DIV");
+    tmp.innerHTML = html;
+    return tmp.textContent || tmp.innerText || "";
   };
 
   // FIXED: Archived notes don't show in favorites filter
@@ -116,9 +121,7 @@ export default function Dashboard() {
           </button>
 
           <div className="flex items-center gap-3">
-            <div
-              className={`w-10 h-9 bg-gradient-to-r ${theme.gradient} rounded-xl shadow-lg flex items-center justify-center`}
-            >
+            <div className={`w-10 h-9 bg-gradient-to-r ${theme.gradient} rounded-xl shadow-lg flex items-center justify-center`}>
               <Feather className="text-white" size={24} />
             </div>
 
@@ -126,7 +129,6 @@ export default function Dashboard() {
               Ilmora Writes
             </span>
           </div>
-
         </div>
 
         <div className="hidden md:flex gap-6 text-sm font-medium items-center">
@@ -386,7 +388,7 @@ export default function Dashboard() {
                 transition={{ delay: index * 0.03 }}
                 className={`relative p-5 rounded-2xl backdrop-blur-sm ${theme.card} border ${theme.cardHover} shadow-lg transition-all group`}
               >
-                {/* Toggle Buttons - Top Right (Simple) */}
+                {/* Toggle Buttons - Top Right */}
                 <div className="absolute top-4 right-4 flex items-center gap-1 z-10">
                   {/* Favorite Button */}
                   <button
@@ -396,10 +398,11 @@ export default function Dashboard() {
                       e.stopPropagation();
                       handleToggleFavorite(note._id);
                     }}
-                    className={`p-2 rounded-lg transition-all cursor-pointer ${note.isFavorite
-                      ? 'text-pink-400 hover:text-pink-500 hover:bg-pink-500/10'
-                      : 'text-gray-400 hover:text-pink-400 hover:bg-pink-500/10'
-                      }`}
+                    className={`p-2 rounded-lg transition-all cursor-pointer ${
+                      note.isFavorite
+                        ? 'text-pink-400 hover:text-pink-500 hover:bg-pink-500/10'
+                        : 'text-gray-400 hover:text-pink-400 hover:bg-pink-500/10'
+                    }`}
                     title={note.isFavorite ? "Remove from favorites" : "Add to favorites"}
                   >
                     <Star
@@ -417,10 +420,11 @@ export default function Dashboard() {
                       e.stopPropagation();
                       handleToggleArchive(note._id);
                     }}
-                    className={`p-2 rounded-lg transition-all cursor-pointer ${note.isArchived
-                      ? " hover:bg-red-500/10 hover:text-red-400  "
-                      : "hover:bg-red-500/10 hover:text-red-400 "
-                      }`}
+                    className={`p-2 rounded-lg transition-all cursor-pointer ${
+                      note.isArchived
+                        ? "text-blue-400 hover:text-blue-300 hover:bg-blue-500/20"
+                        : "text-gray-500 hover:text-gray-300 hover:bg-gray-500/20"
+                    }`}
                     title={note.isArchived ? "Restore note" : "Archive note"}
                   >
                     <Archive size={16} />
@@ -437,7 +441,7 @@ export default function Dashboard() {
                   </h3>
 
                   <p className={`text-sm line-clamp-4 ${theme.textMuted} mb-4`}>
-                    {note.content}
+                    {stripHtml(note.content)}
                   </p>
                 </div>
 
@@ -478,7 +482,7 @@ export default function Dashboard() {
 
                     {/* Show "Archived" badge instead when archived */}
                     {note.isArchived && (
-                      <span className="text-xs hover:bg-orange-500/10 hover:text-orange-400  rounded-lg">
+                      <span className="text-xs text-gray-400 px-2 py-1 bg-gray-500/20 rounded-lg">
                         Archived
                       </span>
                     )}
