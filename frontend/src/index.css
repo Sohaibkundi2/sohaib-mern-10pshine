@@ -17,3 +17,12 @@
   --shadow-soft: 0 8px 32px rgba(0, 0, 0, 0.4);
   --shadow-strong: 0 12px 40px rgba(0, 0, 0, 0.6);
 }
+
+
+
+.custom-border {
+    border: 2px solid palevioletred;
+    background-color: transparent;
+    webkit-backdrop-filter: blur(20px);
+    box-shadow: 0 0 20px #d87093;
+}

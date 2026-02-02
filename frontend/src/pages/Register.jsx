@@ -1,10 +1,11 @@
 // src/pages/Register.jsx
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { motion } from "framer-motion"
 import { User, AtSign, Mail, Lock, Eye, EyeOff, Upload, Feather } from "lucide-react"
 import { authAPI } from "../services/api"
 import { theme } from "../utils/theme"
+import Spline3DCharacter from "../components/Spline3DCharacter"
 
 export default function Register() {
     const navigate = useNavigate()
@@ -23,6 +24,16 @@ export default function Register() {
     const [showConfirmPassword, setShowConfirmPassword] = useState(false)
     const [error, setError] = useState("")
     const [loading, setLoading] = useState(false)
+    const [isPasswordFocused, setIsPasswordFocused] = useState(false)
+    const [isTyping, setIsTyping] = useState(false)
+
+    useEffect(() => {
+        if (formData.fullName || formData.username || formData.email || formData.password || formData.confirmPassword) {
+            setIsTyping(true)
+            const timer = setTimeout(() => setIsTyping(false), 500)
+            return () => clearTimeout(timer)
+        }
+    }, [formData])
 
     const handleChange = (e) => {
         const { name, value } = e.target
@@ -101,175 +112,196 @@ export default function Register() {
     }
 
     return (
-        <div className={`min-h-screen flex items-center justify-center bg-gradient-to-br ${theme.background} px-4 py-8`}>
-            <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-                className={`max-w-md w-full p-8 rounded-3xl backdrop-blur-xl ${theme.card} border shadow-2xl`}
-            >
-                {/* Logo */}
-                <div className="flex justify-center mb-6">
-                    <div className="flex items-center gap-2">
-                        <div className={`w-10 h-10 bg-gradient-to-r ${theme.gradient} rounded-xl shadow-lg flex items-center justify-center`}>
-                        <Feather className="text-white" size={24} />
-                        </div>
-                        <span className={`text-2xl font-bold ${theme.gradientText}`}>
-                            Ilmora Writes
-                        </span>
-                    </div>
+        <div className={`min-h-screen flex items-center justify-between bg-[#0F1A32] relative overflow-hidden`}>
+            
+            {/* 3D Character - DESKTOP ONLY */}
+            <div className="hidden lg:flex lg:w-1/2 h-screen items-center justify-center p-4">
+                <div className="w-full h-full max-w-2xl">
+                    <Spline3DCharacter 
+                        isTyping={isTyping}
+                        isPasswordFocused={isPasswordFocused}
+                    />
                 </div>
+            </div>
 
-                <h2 className={`text-2xl font-semibold text-center ${theme.text} mb-2`}>
-                    Create Account
-                </h2>
-                <p className={`text-center ${theme.textMuted} text-sm mb-6`}>
-                    Join Glass Notes today
-                </p>
-
-                {error && (
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        className={`${theme.error} text-sm p-3 rounded-xl text-center mb-4`}
-                    >
-                        {error}
-                    </motion.div>
-                )}
-
-                <form onSubmit={handleSubmit} className="space-y-4">
-                    {/* Avatar Upload */}
-                    <div className="flex flex-col items-center mb-4">
-                        <label className="cursor-pointer group">
-                            <div className={`w-24 h-24 rounded-full bg-gradient-to-r from-orange-500/20 to-pink-500/20 border-2 border-dashed ${theme.border} hover:border-orange-400 flex items-center justify-center transition-all overflow-hidden group-hover:scale-105`}>
-                                {avatarPreview ? (
-                                    <img src={avatarPreview} alt="Avatar" className="w-full h-full object-cover" />
-                                ) : (
-                                    <Upload className="text-orange-400" size={32} />
-                                )}
+            {/* Register Form */}
+            <div className="w-full lg:w-1/2 flex items-center justify-center p-4 lg:p-8">
+                <motion.div
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.5 }}
+                    className={`max-w-md w-full p-6 rounded-3xl backdrop-blur-xl ${theme.card} border shadow-2xl custom-border`}
+                >
+                    {/* Logo and Title - Side by Side */}
+                    <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-2">
+                            <div className={`w-9 h-9 bg-gradient-to-r ${theme.gradient} rounded-xl shadow-lg flex items-center justify-center`}>
+                                <Feather className="text-white" size={20} />
                             </div>
-                            <input
-                                type="file"
-                                accept="image/*"
-                                onChange={handleAvatarChange}
-                                className="hidden"
-                            />
-                        </label>
-                        <p className={`text-xs ${theme.textMuted} mt-2`}>Click to upload avatar</p>
-                    </div>
-
-                    <div>
-                        <label className={`text-sm ${theme.textMuted} mb-1 block`}>Full Name</label>
-                        <div className="relative">
-                            <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-                            <input
-                                type="text"
-                                name="fullName"
-                                placeholder="John Doe"
-                                value={formData.fullName}
-                                onChange={handleChange}
-                                className={`w-full p-3 pl-10 rounded-xl ${theme.input} ${theme.text} placeholder-gray-500 outline-none transition-all focus:ring-2 focus:ring-orange-500/50`}
-                            />
+                            <span className={`text-lg font-bold ${theme.gradientText}`}>
+                                Ilmora Writes
+                            </span>
                         </div>
+                        <h2 className={`text-lg font-semibold ${theme.text}`}>
+                            Create Account
+                        </h2>
                     </div>
 
-                    <div>
-                        <label className={`text-sm ${theme.textMuted} mb-1 block`}>Username</label>
-                        <div className="relative">
-                            <AtSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-                            <input
-                                type="text"
-                                name="username"
-                                placeholder="johndoe123"
-                                value={formData.username}
-                                onChange={handleChange}
-                                className={`w-full p-3 pl-10 rounded-xl ${theme.input} ${theme.text} placeholder-gray-500 outline-none transition-all focus:ring-2 focus:ring-orange-500/50`}
-                            />
+                    {error && (
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            className={`${theme.error} text-xs p-2.5 rounded-lg text-center mb-3`}
+                        >
+                            {error}
+                        </motion.div>
+                    )}
+
+                    <form onSubmit={handleSubmit} className="space-y-3">
+                        <div>
+                            <label className={`text-xs ${theme.textMuted} mb-1 block`}>Full Name</label>
+                            <div className="relative">
+                                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
+                                <input
+                                    type="text"
+                                    name="fullName"
+                                    placeholder="John Doe"
+                                    value={formData.fullName}
+                                    onChange={handleChange}
+                                    className={`w-full p-2.5 pl-9 rounded-xl ${theme.input} ${theme.text} placeholder-gray-500 text-sm outline-none transition-all focus:ring-2 focus:ring-[#d87091]`}
+                                />
+                            </div>
                         </div>
-                    </div>
 
-                    <div>
-                        <label className={`text-sm ${theme.textMuted} mb-1 block`}>Email</label>
-                        <div className="relative">
-                            <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-                            <input
-                                type="email"
-                                name="email"
-                                placeholder="john@example.com"
-                                value={formData.email}
-                                onChange={handleChange}
-                                className={`w-full p-3 pl-10 rounded-xl ${theme.input} ${theme.text} placeholder-gray-500 outline-none transition-all focus:ring-2 focus:ring-orange-500/50`}
-                            />
+                        <div>
+                            <label className={`text-xs ${theme.textMuted} mb-1 block`}>Username</label>
+                            <div className="relative">
+                                <AtSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
+                                <input
+                                    type="text"
+                                    name="username"
+                                    placeholder="johndoe123"
+                                    value={formData.username}
+                                    onChange={handleChange}
+                                    className={`w-full p-2.5 pl-9 rounded-xl ${theme.input} ${theme.text} placeholder-gray-500 text-sm outline-none transition-all focus:ring-2 focus:ring-[#d87091]`}
+                                />
+                            </div>
                         </div>
-                    </div>
 
-                    <div>
-                        <label className={`text-sm ${theme.textMuted} mb-1 block`}>Password</label>
-                        <div className="relative">
-                            <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-                            <input
-                                type={showPassword ? "text" : "password"}
-                                name="password"
-                                placeholder="••••••••"
-                                value={formData.password}
-                                onChange={handleChange}
-                                className={`w-full p-3 pl-10 pr-10 rounded-xl ${theme.input} ${theme.text} placeholder-gray-500 outline-none transition-all focus:ring-2 focus:ring-orange-500/50`}
-                            />
-                            <button
-                                type="button"
-                                onClick={() => setShowPassword(!showPassword)}
-                                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-orange-400 transition-colors"
-                            >
-                                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                            </button>
+                        <div>
+                            <label className={`text-xs ${theme.textMuted} mb-1 block`}>Email</label>
+                            <div className="relative">
+                                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
+                                <input
+                                    type="email"
+                                    name="email"
+                                    placeholder="john@example.com"
+                                    value={formData.email}
+                                    onChange={handleChange}
+                                    className={`w-full p-2.5 pl-9 rounded-xl ${theme.input} ${theme.text} placeholder-gray-500 text-sm outline-none transition-all focus:ring-2 focus:ring-[#d87091]`}
+                                />
+                            </div>
                         </div>
-                    </div>
 
-                    <div>
-                        <label className={`text-sm ${theme.textMuted} mb-1 block`}>Confirm Password</label>
-                        <div className="relative">
-                            <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-                            <input
-                                type={showConfirmPassword ? "text" : "password"}
-                                name="confirmPassword"
-                                placeholder="••••••••"
-                                value={formData.confirmPassword}
-                                onChange={handleChange}
-                                className={`w-full p-3 pl-10 pr-10 rounded-xl ${theme.input} ${theme.text} placeholder-gray-500 outline-none transition-all focus:ring-2 focus:ring-orange-500/50`}
-                            />
-                            <button
-                                type="button"
-                                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-orange-400 transition-colors"
-                            >
-                                {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                            </button>
+                        <div>
+                            <label className={`text-xs ${theme.textMuted} mb-1 block`}>Password</label>
+                            <div className="relative">
+                                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
+                                <input
+                                    type={showPassword ? "text" : "password"}
+                                    name="password"
+                                    placeholder="••••••••"
+                                    value={formData.password}
+                                    onChange={handleChange}
+                                    onFocus={() => setIsPasswordFocused(true)}
+                                    onBlur={() => setIsPasswordFocused(false)}
+                                    className={`w-full p-2.5 pl-9 pr-9 rounded-xl ${theme.input} ${theme.text} placeholder-gray-500 text-sm outline-none transition-all focus:ring-2 focus:ring-[#d87091]`}
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-orange-400 transition-colors"
+                                >
+                                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                                </button>
+                            </div>
                         </div>
-                    </div>
 
-                    <motion.button
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                        type="submit"
-                        disabled={loading}
-                        className={`w-full p-3 rounded-xl ${theme.button} ${theme.buttonHover} text-white font-medium disabled:opacity-50 disabled:cursor-not-allowed shadow-lg transition-all`}
-                    >
-                        {loading ? "Creating Account..." : "Register"}
-                    </motion.button>
+                        <div>
+                            <label className={`text-xs ${theme.textMuted} mb-1 block`}>Confirm Password</label>
+                            <div className="relative">
+                                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
+                                <input
+                                    type={showConfirmPassword ? "text" : "password"}
+                                    name="confirmPassword"
+                                    placeholder="••••••••"
+                                    value={formData.confirmPassword}
+                                    onChange={handleChange}
+                                    className={`w-full p-2.5 pl-9 pr-9 rounded-xl ${theme.input} ${theme.text} placeholder-gray-500 text-sm outline-none transition-all focus:ring-2 focus:ring-[#d87091]`}
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-orange-400 transition-colors"
+                                >
+                                    {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                                </button>
+                            </div>
+                        </div>
 
-                    <div className="text-center pt-2">
-                        <p className={`text-sm ${theme.textMuted}`}>
-                            Already have an account?{" "}
-                            <Link 
-                                to="/login" 
-                                className="text-orange-400 hover:text-orange-300 font-medium underline transition-colors"
-                            >
-                                Login here
-                            </Link>
-                        </p>
-                    </div>
-                </form>
-            </motion.div>
+                        <div>
+                            <label className={`text-xs ${theme.textMuted} mb-1 block`}>Avatar</label>
+                            <div className="relative">
+                                <label className="cursor-pointer w-full block">
+                                    <div className={`w-full p-2.5 pl-9 pr-3 rounded-xl ${theme.input} border ${theme.border} hover:border-orange-400 transition-all flex items-center justify-between`}>
+                                        <div className="flex items-center gap-2">
+                                            <Upload className="text-gray-400" size={16} />
+                                            <span className={`text-sm ${avatar ? theme.text : 'text-gray-500'}`}>
+                                                {avatar ? avatar.name : 'Click to upload avatar'}
+                                            </span>
+                                        </div>
+                                        {avatarPreview && (
+                                            <img 
+                                                src={avatarPreview} 
+                                                alt="Preview" 
+                                                className="w-8 h-8 rounded-full object-cover border-2 border-orange-400"
+                                            />
+                                        )}
+                                    </div>
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={handleAvatarChange}
+                                        className="hidden"
+                                    />
+                                </label>
+                            </div>
+                        </div>
+
+                        <motion.button
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                            type="submit"
+                            disabled={loading}
+                            className={`w-full p-2.5 rounded-xl ${theme.button} ${theme.buttonHover} text-white text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed shadow-lg transition-all mt-4`}
+                        >
+                            {loading ? "Creating Account..." : "Register"}
+                        </motion.button>
+
+                        <div className="text-center pt-2">
+                            <p className={`text-xs ${theme.textMuted}`}>
+                                Already have an account?{" "}
+                                <Link 
+                                    to="/login" 
+                                    className="text-orange-400 hover:text-orange-300 font-medium underline transition-colors"
+                                >
+                                    Login here
+                                </Link>
+                            </p>
+                        </div>
+                    </form>
+                </motion.div>
+            </div>
         </div>
     )
 }
