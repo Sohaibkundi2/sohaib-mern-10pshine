@@ -1,5 +1,6 @@
 // src/pages/Dashboard.jsx
 import { useState, useEffect } from "react";
+import socketService from "../services/socket";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, Edit, Trash2, Plus, Star, Archive, FolderOpen, Search, Feather } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -26,6 +27,61 @@ export default function Dashboard() {
     isOpen: false,
     note: null,
   });
+
+  // Socket.IO real-time sync
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+
+    if (token) {
+      // Connect socket
+      socketService.connect(token);
+
+      // Listen for note created
+      const handleNoteCreated = (note) => {
+        console.log('📝 Note created (real-time):', note);
+        setNotes(prevNotes => [note, ...prevNotes]);
+      };
+
+      // Listen for note updated
+      const handleNoteUpdated = (updatedNote) => {
+        console.log('✏️ Note updated (real-time):', updatedNote);
+        setNotes(prevNotes =>
+          prevNotes.map(note =>
+            note._id === updatedNote._id ? updatedNote : note
+          )
+        );
+      };
+
+      // Listen for note deleted
+      const handleNoteDeleted = (data) => {
+        console.log('🗑️ Note deleted (real-time):', data);
+        setNotes(prevNotes =>
+          prevNotes.filter(note => note._id !== data._id)
+        );
+      };
+
+      // Listen for refresh request
+      const handleRefresh = () => {
+        console.log('🔄 Refresh requested');
+        fetchNotes();
+      };
+
+      // Register listeners
+      socketService.onNoteCreated(handleNoteCreated);
+      socketService.onNoteUpdated(handleNoteUpdated);
+      socketService.onNoteDeleted(handleNoteDeleted);
+      socketService.onNotesRefresh(handleRefresh);
+
+      // Cleanup on unmount
+      return () => {
+        socketService.off('note:created', handleNoteCreated);
+        socketService.off('note:updated', handleNoteUpdated);
+        socketService.off('note:deleted', handleNoteDeleted);
+        socketService.off('notes:refresh', handleRefresh);
+        socketService.disconnect();
+      };
+    }
+  }, []);
 
   useEffect(() => {
     fetchNotes();
@@ -57,13 +113,7 @@ export default function Dashboard() {
   const handleToggleFavorite = async (noteId) => {
     try {
       await notesAPI.toggleFavorite(noteId);
-      setNotes(prevNotes =>
-        prevNotes.map(note =>
-          note._id === noteId
-            ? { ...note, isFavorite: !note.isFavorite }
-            : note
-        )
-      );
+      
     } catch (err) {
       console.error("Failed to toggle favorite:", err);
     }
@@ -73,13 +123,6 @@ export default function Dashboard() {
     try {
       await notesAPI.toggleArchive(noteId);
 
-      setNotes(prevNotes =>
-        prevNotes.map(note =>
-          note._id === noteId
-            ? { ...note, isArchived: !note.isArchived }
-            : note
-        )
-      );
     } catch (err) {
       console.error("Failed to toggle archive:", err);
     }
@@ -276,7 +319,7 @@ export default function Dashboard() {
             <p className="text-xs text-gray-400">Favorites</p>
           </div>
           <div className={`p-3 rounded-lg ${theme.card} border text-center`}>
-            <p className="text-2xl font-bold text-gray-300">{stats.archived}</p>
+            <p className="text-2xl font-bold text-amber-300">{stats.archived}</p>
             <p className="text-xs text-gray-400">Archived</p>
           </div>
         </div>
@@ -303,7 +346,7 @@ export default function Dashboard() {
 
           <button
             onClick={() => setActiveFilter("archived")}
-            className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition text-sm font-medium ${activeFilter === "archived" ? "bg-gray-500/20 text-gray-300 border border-gray-500/30" : `${theme.textMuted} hover:bg-white/10`
+            className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition text-sm font-medium ${activeFilter === "archived" ? "bg-amber-500/20 text-amber-300 border border-amber-500/30" : `${theme.textMuted} hover:bg-white/10`
               }`}
           >
             <Archive size={18} />
@@ -398,11 +441,10 @@ export default function Dashboard() {
                       e.stopPropagation();
                       handleToggleFavorite(note._id);
                     }}
-                    className={`p-2 rounded-lg transition-all cursor-pointer ${
-                      note.isFavorite
+                    className={`p-2 rounded-lg transition-all cursor-pointer ${note.isFavorite
                         ? 'text-pink-400 hover:text-pink-500 hover:bg-pink-500/10'
                         : 'text-gray-400 hover:text-pink-400 hover:bg-pink-500/10'
-                    }`}
+                      }`}
                     title={note.isFavorite ? "Remove from favorites" : "Add to favorites"}
                   >
                     <Star
@@ -420,11 +462,10 @@ export default function Dashboard() {
                       e.stopPropagation();
                       handleToggleArchive(note._id);
                     }}
-                    className={`p-2 rounded-lg transition-all cursor-pointer ${
-                      note.isArchived
-                        ? "text-blue-400 hover:text-blue-300 hover:bg-blue-500/20"
+                    className={`p-2 rounded-lg transition-all cursor-pointer ${note.isArchived
+                        ? "text-amber-400 hover:text-amber-300 hover:bg-amber-500/20"
                         : "text-gray-500 hover:text-gray-300 hover:bg-gray-500/20"
-                    }`}
+                      }`}
                     title={note.isArchived ? "Restore note" : "Archive note"}
                   >
                     <Archive size={16} />

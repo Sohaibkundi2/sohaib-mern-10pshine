@@ -1,8 +1,18 @@
+// src/controllers/note.controller.js
 import { Note } from "../models/note.model.js";
 import ApiError from "../utils/apiError.js";
-import {ApiResponse} from "../utils/apiResponce.js";
-import {asyncHandler} from "../utils/asyncHandler.js";
+import { ApiResponse } from "../utils/apiResponce.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
 import logger from "../utils/logger.js";
+
+// Helper function to emit socket events
+const emitNoteEvent = (req, event, data) => {
+  const io = req.app.get('io');
+  if (io) {
+    io.to(`user:${req.user._id}`).emit(event, data);
+    logger.info({ event, userId: req.user._id }, 'Socket event emitted');
+  }
+};
 
 const createNote = asyncHandler(async (req, res) => {
   const { title, content } = req.body;
@@ -15,6 +25,9 @@ const createNote = asyncHandler(async (req, res) => {
   });
 
   logger.info({ noteId: note._id, userId: req.user._id }, "Note created");
+
+  // Emit socket event for real-time sync
+  emitNoteEvent(req, 'note:created', note);
 
   res.status(201).json(new ApiResponse(201, note, "Note created successfully"));
 });
@@ -67,6 +80,9 @@ const updateNote = asyncHandler(async (req, res) => {
 
   logger.info({ noteId: req.params.id }, "Updated note");
 
+  // Emit socket event for real-time sync
+  emitNoteEvent(req, 'note:updated', note);
+
   res.status(200).json(new ApiResponse(200, note, "Note updated successfully"));
 });
 
@@ -75,6 +91,9 @@ const deleteNote = asyncHandler(async (req, res) => {
   if (!note) throw new ApiError(404, "Note not found or not authorized");
 
   logger.warn({ noteId: req.params.id }, "Deleted note");
+
+  // Emit socket event for real-time sync
+  emitNoteEvent(req, 'note:deleted', { _id: req.params.id });
 
   res.status(200).json(new ApiResponse(200, null, "Note deleted successfully"));
 });
@@ -98,6 +117,9 @@ const toggleFavorite = asyncHandler(async (req, res) => {
     userId: req.user._id,
     isFavorite: note.isFavorite 
   }, 'Note favorite toggled');
+
+  // Emit socket event for real-time sync
+  emitNoteEvent(req, 'note:updated', note);
 
   res.status(200).json(
     new ApiResponse(200, note, `Note ${note.isFavorite ? 'added to' : 'removed from'} favorites`)
@@ -124,6 +146,9 @@ const toggleArchive = asyncHandler(async (req, res) => {
     "Toggled note archive status"
   );
 
+  // Emit socket event for real-time sync
+  emitNoteEvent(req, 'note:updated', note);
+
   res
     .status(200)
     .json(
@@ -134,7 +159,5 @@ const toggleArchive = asyncHandler(async (req, res) => {
       )
     );
 });
-
-
 
 export { createNote, getAllNotes, getNoteById, updateNote, deleteNote, toggleFavorite, toggleArchive };

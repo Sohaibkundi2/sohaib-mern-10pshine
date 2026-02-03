@@ -26,3 +26,6 @@
     webkit-backdrop-filter: blur(20px);
     box-shadow: 0 0 20px #d87093;
 }
+canvas {
+  pointer-events: none;
+}
