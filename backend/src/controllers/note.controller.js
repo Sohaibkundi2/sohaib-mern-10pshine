@@ -160,4 +160,65 @@ const toggleArchive = asyncHandler(async (req, res) => {
     );
 });
 
-export { createNote, getAllNotes, getNoteById, updateNote, deleteNote, toggleFavorite, toggleArchive };
+// NEW: Search notes
+const searchNotes = asyncHandler(async (req, res) => {
+  const { q, favorite, archived } = req.query;
+
+  if (!q || q.trim().length === 0) {
+    throw new ApiError(400, "Search query is required");
+  }
+
+  const searchQuery = q.trim();
+
+  // Build filter
+  const filter = {
+    owner: req.user._id,
+    $or: [
+      { title: { $regex: searchQuery, $options: 'i' } },
+      { content: { $regex: searchQuery, $options: 'i' } }
+    ]
+  };
+
+  // Apply additional filters
+  if (favorite === "true") {
+    filter.isFavorite = true;
+  }
+
+  if (archived === "true") {
+    filter.isArchived = true;
+  } else if (archived === "false") {
+    filter.isArchived = false;
+  }
+
+  const notes = await Note.find(filter).sort({ createdAt: -1 });
+
+  logger.info(
+    { 
+      query: searchQuery, 
+      count: notes.length, 
+      userId: req.user._id 
+    },
+    "Search notes"
+  );
+
+  res.status(200).json(
+    new ApiResponse(
+      200, 
+      notes, 
+      notes.length > 0 
+        ? `Found ${notes.length} note(s)` 
+        : "No notes found"
+    )
+  );
+});
+
+export { 
+  createNote, 
+  getAllNotes, 
+  getNoteById, 
+  updateNote, 
+  deleteNote, 
+  toggleFavorite, 
+  toggleArchive,
+  searchNotes 
+};
