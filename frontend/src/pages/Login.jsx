@@ -73,7 +73,7 @@ export default function Login() {
     }
 
     return (
-        <div className={`min-h-screen flex items-center justify-between bg-[#0F1A32] relative overflow-hidden`}>
+        <div className={`min-h-screen flex items-center justify-between bg-[#161F38] relative overflow-hidden`}>
             
             {/* 3D Character - DESKTOP ONLY */}
             <div className="hidden lg:flex lg:w-1/2 h-screen items-center justify-center p-8">
