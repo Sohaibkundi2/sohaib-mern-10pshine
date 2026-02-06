@@ -49,7 +49,7 @@ export const getPasswordResetEmailTemplate = (resetUrl, userName) => {
           padding: 20px;
         }
         .container {
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          background: linear-gradient(135deg, #d87093 0%, #764ba2 100%);
           padding: 30px;
           border-radius: 10px;
           color: white;
@@ -64,7 +64,7 @@ export const getPasswordResetEmailTemplate = (resetUrl, userName) => {
         .button {
           display: inline-block;
           padding: 12px 30px;
-          background: linear-gradient(135deg, #f97316 0%, #ec4899 100%);
+          background: linear-gradient(135deg, #dd25af 0%, #d87093 100%);
           color: white;
           text-decoration: none;
           border-radius: 8px;
@@ -87,7 +87,7 @@ export const getPasswordResetEmailTemplate = (resetUrl, userName) => {
     </head>
     <body>
       <div class="container">
-        <h1>🔐 Glass Notes</h1>
+        <h1>🔐 Ilmora Writes</h1>
         
         <div class="content">
           <h2>Password Reset Request</h2>
@@ -107,7 +107,7 @@ export const getPasswordResetEmailTemplate = (resetUrl, userName) => {
           
           <div class="footer">
             <p>This is an automated email. Please do not reply.</p>
-            <p>&copy; ${new Date().getFullYear()} Glass Notes. All rights reserved.</p>
+            <p>&copy; ${new Date().getFullYear()} Ilmora Writes. All rights reserved.</p>
           </div>
         </div>
       </div>

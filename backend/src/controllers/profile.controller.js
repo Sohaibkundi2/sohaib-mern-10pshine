@@ -4,6 +4,7 @@ import { ApiResponse } from "../utils/apiResponce.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import logger from "../utils/logger.js";
+import { sanitizeEmail } from "../utils/sanitize.js";
 
 const getCurrentUser = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id).select("-password -refreshToken");
@@ -17,9 +18,10 @@ const updateProfile = asyncHandler(async (req, res) => {
     throw new ApiError(400, "At least one field is required");
   }
 
+  // Sanitize inputs to prevent NoSQL injection
   const updateData = {};
-  if (fullName) updateData.fullName = fullName;
-  if (email) updateData.email = email;
+  if (fullName) updateData.fullName = String(fullName).trim();
+  if (email) updateData.email = sanitizeEmail(email);
 
   const user = await User.findByIdAndUpdate(
     req.user._id,
@@ -32,7 +34,6 @@ const updateProfile = asyncHandler(async (req, res) => {
   res.status(200).json(new ApiResponse(200, user, "Profile updated"));
 });
 
-
 const updatePassword = asyncHandler(async (req, res) => {
   const { oldPassword, newPassword } = req.body;
   if (!oldPassword || !newPassword) throw new ApiError(400, "Both required");
@@ -41,7 +42,8 @@ const updatePassword = asyncHandler(async (req, res) => {
   const valid = await user.isPasswordCorrect(oldPassword);
   if (!valid) throw new ApiError(401, "Old password incorrect");
 
-  user.password = newPassword;
+  // Sanitize password (basic string conversion)
+  user.password = String(newPassword);
   await user.save({ validateBeforeSave: false });
 
   logger.warn({ userId: req.user._id }, "Password updated");
@@ -73,6 +75,5 @@ const updateAvatar = asyncHandler(async (req, res) => {
 
   res.status(200).json(new ApiResponse(200, user, "Avatar updated successfully"));
 });
-
 
 export { getCurrentUser, updateProfile, updatePassword, updateAvatar };
