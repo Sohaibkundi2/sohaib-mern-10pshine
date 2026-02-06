@@ -142,8 +142,14 @@ export const notesAPI = {
   // Toggle favorite status
   toggleFavorite: (id) => api.patch(`/notes/${id}/favorite`),
 
-  // Toggle archive status  
+  // Toggle archive status
   toggleArchive: (id) => api.patch(`/notes/${id}/archive`),
+
+  // Search notes
+  search: (query, params = {}) =>
+    api.get("/notes/search", {
+      params: { q: query, ...params },
+    }),
 };
 
 export default api;
