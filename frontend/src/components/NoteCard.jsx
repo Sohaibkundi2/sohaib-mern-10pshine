@@ -21,7 +21,7 @@ export default function NoteCard({
       transition={{ delay: index * 0.03 }}
       className={`
         ${note.isFavorite ? 'glow-border-pink' : note.isArchived ? 'glow-border-blue' : 'glow-border-orange'}
-        relative p-5 rounded-2xl backdrop-blur-sm ${theme.card} border ${theme.cardHover} shadow-lg transition-all group
+        relative p-5 rounded-2xl backdrop-blur-sm ${theme.card} border ${theme.cardHover}  shadow-lg transition-all group
       `}
     >
       {/* Toggle Buttons - Top Right */}
