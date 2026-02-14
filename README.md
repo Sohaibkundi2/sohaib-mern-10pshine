@@ -8,7 +8,7 @@
 
 **Your personal space for notes and ideas**
 
-[Features](#features) • [Installation](#installation) • [Testing](#testing) • [Tech Stack](#tech-stack)
+[Features](#features) • [Screenshots](#screenshots) • [Installation](#installation) • [Testing](#testing) • [Tech Stack](#tech-stack)
 
 </div>
 
@@ -19,6 +19,46 @@
 **Ilmora Writes** is a modern, full-stack note-taking application built with the MERN stack (MongoDB, Express.js, React, Node.js). It provides a beautiful, intuitive interface for creating, organizing, and managing your notes with features like favorites, archiving, search functionality, and real-time synchronization using Socket.IO.
 
 This project was developed as part of the **10P SHINE Internship Program (January 2026)** to demonstrate proficiency in full-stack web development.
+
+---
+
+## Screenshots
+
+<div align="center">
+
+### Login Page
+![Login Page](screenshots/login.png)
+*Secure login with beautiful glassmorphism design*
+
+### Signup Page
+![Signup Page](screenshots/signup.png)
+*User registration with avatar upload*
+
+### Dashboard
+![Dashboard](screenshots/dashboard.png)
+*Clean and intuitive notes dashboard*
+
+### Note Editor
+![Note Editor](screenshots/editor.png)
+*Simple note creation and editing interface*
+
+### Search & Filter
+![Search](screenshots/search.png)
+*Powerful search with real-time results*
+
+### Profile Management
+![Profile](screenshots/profile.png)
+*User profile with statistics*
+
+### Settings
+![Settings](screenshots/settings.png)
+*Update profile, password, and avatar*
+
+### Password Reset
+![Password Reset](screenshots/reset-password.png)
+*Secure password reset via email*
+
+</div>
 
 ---
 
@@ -211,6 +251,7 @@ ilmora-writes/
 │   ├── .env                  # Environment variables
 │   └── package.json
 │
+├── screenshots/              # Project screenshots
 └── README.md
 ```
 
@@ -381,10 +422,10 @@ If you have any questions or need help with setup, please:
 
 <div align="center">
 
-**Made with love by Sohaib Khan**
+**Made with ❤️ by Sohaib Khan**
 
 **10P SHINE Internship Project • January 2026**
 
-Star this repo if you found it helpful!
+⭐ Star this repo if you found it helpful!
 
 </div>
