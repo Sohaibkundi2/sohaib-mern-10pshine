@@ -10,7 +10,7 @@ export const theme = {
   cardHover: "hover:bg-slate-700/80 hover:border-orange-500/30",
   
   // Inputs & Forms
-  input: "bg-slate-800/50 border-slate-700 focus:border-orange-400 focus:bg-slate-700/60",
+  input: "bg-slate-800/50 border-slate-700 focus:bg-slate-700/60",
   inputFocus: "focus:border-orange-400 focus:ring-2 focus:ring-orange-500/20",
   
   // Text Colors

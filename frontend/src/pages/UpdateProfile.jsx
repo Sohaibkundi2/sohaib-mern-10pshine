@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { ArrowLeft, Save, Camera, Lock, User, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { profileAPI, authAPI } from "../services/api";
+import { profileAPI } from "../services/api";
 import { theme } from "../utils/theme";
 import Navbar from "../components/Navbar";
 
@@ -124,7 +124,7 @@ export default function UpdateProfile() {
 
     try {
       setIsChangingPassword(true);
-      await authAPI.changePassword({ oldPassword, newPassword });
+      await profileAPI.updatePassword({ oldPassword, newPassword });
 
       showMessage("Password changed successfully!");
       setPasswordData({ oldPassword: "", newPassword: "", confirmPassword: "" });
@@ -139,6 +139,10 @@ export default function UpdateProfile() {
   const handleAvatarSelect = (e) => {
     const file = e.target.files[0];
     if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        showMessage("", "Image size must be less than 5MB");
+        return;
+      }
       setAvatar(file);
       setAvatarPreview(URL.createObjectURL(file));
     }
@@ -174,225 +178,228 @@ export default function UpdateProfile() {
 
       {/* Main Content */}
       <div className="pt-20 p-4 md:p-8">
-      <div className="max-w-3xl mx-auto">
-        {/* Header */}
-        <div className="flex justify-between items-center md:mt-14 mb-6 md:mb-0">
-          <button
-            onClick={() => navigate("/profile")}
-            className={`flex items-center gap-2 ${theme.textMuted} hover:text-orange-400 transition-colors`}
-          >
-            <ArrowLeft size={20} />
-            <span>Back to Profile</span>
-          </button>
+        <div className="max-w-3xl mx-auto">
+          {/* Header */}
+          <div className="flex justify-between items-center md:mt-14 mb-6 md:mb-0">
+            <button
+              onClick={() => navigate("/profile")}
+              className={`flex items-center gap-2 ${theme.textMuted} hover:text-orange-400 transition-colors`}
+            >
+              <ArrowLeft size={20} />
+              <span>Back to Profile</span>
+            </button>
 
-          <button
-            onClick={() => navigate("/dashboard")}
-            className={`${theme.textMuted} hover:text-orange-400 transition-colors`}
-          >
-            <X size={24} />
-          </button>
-        </div>
-
-        <h1 className={`text-3xl md:text-4xl font-bold ${theme.gradientText} mb-2 text-center`}>
-          Update Profile
-        </h1>
-        <p className={`text-center ${theme.textMuted} mb-8`}>
-          Manage your account settings
-        </p>
-
-        {successMessage && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className={`${theme.success} p-3 rounded-xl mb-6 text-center`}
-          >
-            {successMessage}
-          </motion.div>
-        )}
-
-        {errorMessage && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className={`${theme.error} p-3 rounded-xl mb-6 text-center`}
-          >
-            {errorMessage}
-          </motion.div>
-        )}
-
-        {/* Avatar Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className={`backdrop-blur-xl ${theme.card} border rounded-3xl p-6 md:p-8 mb-6 shadow-2xl`}
-        >
-          <h2 className={`text-xl font-semibold ${theme.text} mb-6 flex items-center gap-2`}>
-            <Camera size={20} className="text-orange-400" />
-            Update Avatar
-          </h2>
-
-          <div className="flex flex-col items-center">
-            <div className="relative mb-6">
-              <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-orange-500/50 shadow-xl">
-                {avatarPreview ? (
-                  <img src={avatarPreview} alt="Avatar" className="w-full h-full object-cover" />
-                ) : (
-                  <div className="w-full h-full bg-gradient-to-br from-orange-500 to-pink-500 flex items-center justify-center text-white text-5xl font-bold">
-                    {user?.fullName?.charAt(0).toUpperCase() || "U"}
-                  </div>
-                )}
-              </div>
-
-              <label
-                htmlFor="avatar-upload"
-                className={`absolute bottom-0 right-0 w-10 h-10 bg-gradient-to-r ${theme.gradient} rounded-full flex items-center justify-center cursor-pointer shadow-lg hover:scale-110 transition-transform`}
-              >
-                <Camera size={18} className="text-white" />
-              </label>
-              <input
-                id="avatar-upload"
-                type="file"
-                accept="image/*"
-                onChange={handleAvatarSelect}
-                className="hidden"
-              />
-            </div>
-
-            {avatar && (
-              <div className="flex gap-3 w-full max-w-md">
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={handleAvatarUpdate}
-                  disabled={isUpdatingAvatar}
-                  className={`flex-1 flex items-center justify-center gap-2 p-3 rounded-xl ${theme.button} ${theme.buttonHover} text-white font-medium disabled:opacity-50 shadow-lg`}
-                >
-                  <Save size={18} />
-                  {isUpdatingAvatar ? "Uploading..." : "Upload Avatar"}
-                </motion.button>
-                <button
-                  onClick={() => { setAvatar(null); setAvatarPreview(user?.avatar); }}
-                  className={`px-6 py-3 rounded-xl ${theme.buttonSecondary} ${theme.text} transition-colors`}
-                >
-                  Cancel
-                </button>
-              </div>
-            )}
+            <button
+              onClick={() => navigate("/dashboard")}
+              className={`${theme.textMuted} hover:text-orange-400 transition-colors`}
+            >
+              <X size={24} />
+            </button>
           </div>
-        </motion.div>
 
-        {/* Profile Info */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className={`backdrop-blur-xl ${theme.card} border rounded-3xl p-6 md:p-8 mb-6 shadow-2xl`}
-        >
-          <h2 className={`text-xl font-semibold ${theme.text} mb-6 flex items-center gap-2`}>
-            <User size={20} className="text-pink-400" />
-            Profile Information
-          </h2>
+          <h1 className={`text-3xl md:text-4xl font-bold ${theme.gradientText} mb-2 text-center`}>
+            Update Profile
+          </h1>
+          <p className={`text-center ${theme.textMuted} mb-8`}>
+            Manage your account settings
+          </p>
 
-          <form onSubmit={handleInfoUpdate} className="space-y-4">
-            <div>
-              <label className={`text-sm ${theme.textMuted} mb-1 block`}>Full Name</label>
-              <input
-                type="text"
-                name="fullName"
-                value={profileData.fullName}
-                onChange={handleProfileChange}
-                placeholder="Your full name"
-                className={`w-full p-3 rounded-xl ${theme.input} ${theme.text} placeholder-gray-500 outline-none transition-all`}
-              />
-            </div>
-
-            <div>
-              <label className={`text-sm ${theme.textMuted} mb-1 block`}>Email</label>
-              <input
-                type="email"
-                name="email"
-                value={profileData.email}
-                onChange={handleProfileChange}
-                placeholder="your@email.com"
-                className={`w-full p-3 rounded-xl ${theme.input} ${theme.text} placeholder-gray-500 outline-none transition-all`}
-              />
-            </div>
-
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              type="submit"
-              disabled={isUpdatingInfo}
-              className={`w-full flex items-center justify-center gap-2 p-3 rounded-xl ${theme.button} ${theme.buttonHover} text-white font-medium disabled:opacity-50 shadow-lg`}
+          {successMessage && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className={`${theme.success} p-3 rounded-xl mb-6 text-center`}
             >
-              <Save size={18} />
-              {isUpdatingInfo ? "Updating..." : "Update Profile"}
-            </motion.button>
-          </form>
-        </motion.div>
+              {successMessage}
+            </motion.div>
+          )}
 
-        {/* Password Change */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className={`backdrop-blur-xl ${theme.card} border rounded-3xl p-6 md:p-8 shadow-2xl`}
-        >
-          <h2 className={`text-xl font-semibold ${theme.text} mb-6 flex items-center gap-2`}>
-            <Lock size={20} className="text-rose-400" />
-            Change Password
-          </h2>
-
-          <form onSubmit={handlePasswordUpdate} className="space-y-4">
-            <div>
-              <label className={`text-sm ${theme.textMuted} mb-1 block`}>Old Password</label>
-              <input
-                type="password"
-                name="oldPassword"
-                value={passwordData.oldPassword}
-                onChange={handlePasswordChange}
-                placeholder="Enter current password"
-                className={`w-full p-3 rounded-xl ${theme.input} ${theme.text} placeholder-gray-500 outline-none transition-all`}
-              />
-            </div>
-
-            <div>
-              <label className={`text-sm ${theme.textMuted} mb-1 block`}>New Password</label>
-              <input
-                type="password"
-                name="newPassword"
-                value={passwordData.newPassword}
-                onChange={handlePasswordChange}
-                placeholder="Enter new password"
-                className={`w-full p-3 rounded-xl ${theme.input} ${theme.text} placeholder-gray-500 outline-none transition-all`}
-              />
-            </div>
-
-            <div>
-              <label className={`text-sm ${theme.textMuted} mb-1 block`}>Confirm New Password</label>
-              <input
-                type="password"
-                name="confirmPassword"
-                value={passwordData.confirmPassword}
-                onChange={handlePasswordChange}
-                placeholder="Confirm new password"
-                className={`w-full p-3 rounded-xl ${theme.input} ${theme.text} placeholder-gray-500 outline-none transition-all`}
-              />
-            </div>
-
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              type="submit"
-              disabled={isChangingPassword}
-              className={`w-full flex items-center justify-center gap-2 p-3 rounded-xl ${theme.button} ${theme.buttonHover} text-white font-medium disabled:opacity-50 shadow-lg`}
+          {errorMessage && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className={`${theme.error} p-3 rounded-xl mb-6 text-center`}
             >
-              <Lock size={18} />
-              {isChangingPassword ? "Changing..." : "Change Password"}
-            </motion.button>
-          </form>
-        </motion.div>
-      </div>
+              {errorMessage}
+            </motion.div>
+          )}
+
+          {/* Avatar Section */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className={`backdrop-blur-xl ${theme.card} border rounded-3xl p-6 md:p-8 mb-6 shadow-2xl`}
+          >
+            <h2 className={`text-xl font-semibold ${theme.text} mb-6 flex items-center gap-2`}>
+              <Camera size={20} className="text-orange-400" />
+              Update Avatar
+            </h2>
+
+            <div className="flex flex-col items-center">
+              <div className="relative mb-6">
+                <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-orange-500/50 shadow-xl">
+                  {avatarPreview ? (
+                    <img src={avatarPreview} alt="Avatar" className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-orange-500 to-pink-500 flex items-center justify-center text-white text-5xl font-bold">
+                      {user?.fullName?.charAt(0).toUpperCase() || "U"}
+                    </div>
+                  )}
+                </div>
+
+                <label
+                  htmlFor="avatar-upload"
+                  className={`absolute bottom-0 right-0 w-10 h-10 bg-gradient-to-r ${theme.gradient} rounded-full flex items-center justify-center cursor-pointer shadow-lg hover:scale-110 transition-transform`}
+                >
+                  <Camera size={18} className="text-white" />
+                </label>
+                <input
+                  id="avatar-upload"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleAvatarSelect}
+                  className="hidden"
+                />
+              </div>
+
+              {avatar && (
+                <div className="flex gap-3 w-full max-w-md">
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={handleAvatarUpdate}
+                    disabled={isUpdatingAvatar}
+                    className={`flex-1 flex items-center justify-center gap-2 p-3 rounded-xl ${theme.button} ${theme.buttonHover} text-white font-medium disabled:opacity-50 shadow-lg`}
+                  >
+                    <Save size={18} />
+                    {isUpdatingAvatar ? "Uploading..." : "Upload Avatar"}
+                  </motion.button>
+                  <button
+                    onClick={() => { setAvatar(null); setAvatarPreview(user?.avatar); }}
+                    className={`px-6 py-3 rounded-xl ${theme.buttonSecondary} ${theme.text} hover:bg-white/10 transition-colors`}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              )}
+            </div>
+          </motion.div>
+
+          {/* Profile Info */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className={`backdrop-blur-xl ${theme.card} border rounded-3xl p-6 md:p-8 mb-6 shadow-2xl`}
+          >
+            <h2 className={`text-xl font-semibold ${theme.text} mb-6 flex items-center gap-2`}>
+              <User size={20} className="text-pink-400" />
+              Profile Information
+            </h2>
+
+            <form onSubmit={handleInfoUpdate} className="space-y-4">
+              <div>
+                <label className={`text-sm ${theme.textMuted} mb-1 block`}>Full Name</label>
+                <input
+                  type="text"
+                  name="fullName"
+                  value={profileData.fullName}
+                  onChange={handleProfileChange}
+                  placeholder="Your full name"
+                  className={`w-full p-3 rounded-xl ${theme.input} ${theme.text} placeholder-gray-500 outline-none focus:ring-2 focus:ring-[#d87091] border-r-2 border-r-rose-400 transition-all`}
+                />
+              </div>
+
+              <div>
+                <label className={`text-sm ${theme.textMuted} mb-1 block`}>Email</label>
+                <input
+                  type="email"
+                  name="email"
+                  value={profileData.email}
+                  onChange={handleProfileChange}
+                  placeholder="your@email.com"
+                  className={`w-full p-3 rounded-xl ${theme.input} ${theme.text} placeholder-gray-500 outline-none focus:ring-2 focus:ring-[#d87091] border-r-2 border-r-rose-400 transition-all`}
+                />
+              </div>
+
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                type="submit"
+                disabled={isUpdatingInfo}
+                className={`w-full flex items-center justify-center gap-2 p-3 rounded-xl ${theme.button} ${theme.buttonHover} text-white font-medium disabled:opacity-50 shadow-lg`}
+              >
+                <Save size={18} />
+                {isUpdatingInfo ? "Updating..." : "Update Profile"}
+              </motion.button>
+            </form>
+          </motion.div>
+
+          {/* Password Change */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className={`backdrop-blur-xl ${theme.card} border rounded-3xl p-6 md:p-8 shadow-2xl`}
+          >
+            <h2 className={`text-xl font-semibold ${theme.text} mb-6 flex items-center gap-2`}>
+              <Lock size={20} className="text-rose-400" />
+              Change Password
+            </h2>
+
+            <form onSubmit={handlePasswordUpdate} className="space-y-4">
+              <div>
+                <label className={`text-sm ${theme.textMuted} mb-1 block`}>Current Password</label>
+                <input
+                  type="password"
+                  name="oldPassword"
+                  value={passwordData.oldPassword}
+                  onChange={handlePasswordChange}
+                  placeholder="Enter current password"
+                  className={`w-full p-3 rounded-xl ${theme.input} ${theme.text} placeholder-gray-500 outline-none focus:ring-2 focus:ring-[#d87091] border-l-2 border-l-rose-400 transition-all`}
+                />
+              </div>
+
+              <div>
+                <label className={`text-sm ${theme.textMuted} mb-1 block`}>New Password</label>
+                <input
+                  type="password"
+                  name="newPassword"
+                  value={passwordData.newPassword}
+                  onChange={handlePasswordChange}
+                  placeholder="Enter new password (min 6 chars)"
+                  className={`w-full p-3 rounded-xl ${theme.input} ${theme.text}custom-border placeholder-gray-500 outline-none focus:ring-2 focus:ring-[#d87091] border-l-2 border-l-rose-400 transition-all `}
+                />
+                <p className={`text-xs ${theme.textMuted} mt-1`}>
+                  Must include uppercase, lowercase, and number
+                </p>
+              </div>
+
+              <div>
+                <label className={`text-sm ${theme.textMuted} mb-1 block`}>Confirm New Password</label>
+                <input
+                  type="password"
+                  name="confirmPassword"
+                  value={passwordData.confirmPassword}
+                  onChange={handlePasswordChange}
+                  placeholder="Confirm new password"
+                  className={`w-full p-3 rounded-xl ${theme.input} ${theme.text} placeholder-gray-500 outline-none focus:ring-2 focus:ring-[#d87091] border-l-2 border-l-rose-400 transition-all`}
+                />
+              </div>
+
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                type="submit"
+                disabled={isChangingPassword}
+                className={`w-full flex items-center justify-center gap-2 p-3 rounded-xl ${theme.button} ${theme.buttonHover} text-white font-medium disabled:opacity-50 shadow-lg`}
+              >
+                <Lock size={18} />
+                {isChangingPassword ? "Changing..." : "Change Password"}
+              </motion.button>
+            </form>
+          </motion.div>
+        </div>
       </div>
     </div>
   );

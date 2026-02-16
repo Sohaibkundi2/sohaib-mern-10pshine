@@ -65,8 +65,9 @@ api.interceptors.response.use(
   },
 );
 
+// ============================================
 // AUTH API ENDPOINTS
-
+// ============================================
 export const authAPI = {
   // Register new user
   signup: (formData) =>
@@ -83,20 +84,17 @@ export const authAPI = {
   // Get current user
   getCurrentUser: () => api.get("/auth/me"),
 
-  // Change password
-  changePassword: (data) => api.post("/auth/change-password", data),
-
   // Refresh token
   refreshToken: () => api.post("/auth/refresh"),
 
-  // NEW: Forgot Password - Send reset email
+  // Forgot Password - Send reset email
   forgotPassword: (data) => api.post("/auth/forgot-password", data),
 
-  // NEW: Reset Password - Update password with token
+  // Reset Password - Update password with token
   resetPassword: (token, data) =>
     api.post(`/auth/reset-password/${token}`, data),
 
-  // NEW: Verify Reset Token - Check if token is valid
+  // Verify Reset Token - Check if token is valid
   verifyResetToken: (token) => api.get(`/auth/verify-reset-token/${token}`),
 };
 
@@ -110,8 +108,8 @@ export const profileAPI = {
   // Update profile info (fullName, email)
   updateProfile: (data) => api.patch("/profile/update", data),
 
-  // Change password
-  changePassword: (data) => api.patch("/profile/password", data),
+  // Update password - FIXED: Changed from changePassword to updatePassword
+  updatePassword: (data) => api.patch("/profile/password", data),
 
   // Update avatar
   updateAvatar: (formData) =>
