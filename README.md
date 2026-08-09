@@ -21,7 +21,9 @@
 This project was developed as part of the **10P SHINE Internship Program (January 2026)** to demonstrate proficiency in full-stack web development.
 
 ---
+## Architecture 
 
+![architecture](./architecture.png)
 ## Screenshots
 
 <div align="center">
